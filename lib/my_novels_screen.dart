@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -20,9 +19,8 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
   List<Map<String, dynamic>> novels = [];
   String? _nameError;
   String? _authorError;
-  List<String> _selectedGenres = [];
+  String? _selectedGenre;
 
-  // เพิ่ม Map ของแนวนิยายกับหมายเลข
   final Map<String, int> genreMap = {
     'แฟนตาซี': 1,
     'โรแมนติก': 2,
@@ -32,15 +30,10 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
     'สยองขวัญ': 6,
   };
 
-
-  // เปลี่ยน List เป็นตัวเลขตาม Map
-  List<int> getSelectedGenreIds() {
-    return _selectedGenres.map((genre) => genreMap[genre] ?? 0).toList();
-  }
-
   final List<String> genres = [
     'แฟนตาซี', 'โรแมนติก', 'สืบสวน', 'วิทยาศาสตร์', 'ผจญภัย', 'สยองขวัญ'
   ];
+
   @override
   void initState() {
     super.initState();
@@ -48,7 +41,8 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
   }
 
   Future<void> fetchNovels() async {
-    final response = await http.get(Uri.parse('http://192.168.1.40:3000/novel'));
+    final response = await http.get(
+        Uri.parse('http://192.168.1.40:3000/novel'));
     if (response.statusCode == 200) {
       setState(() {
         novels = List<Map<String, dynamic>>.from(json.decode(response.body));
@@ -57,16 +51,14 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
   }
 
   Future<void> addNovelToServer() async {
-    final selectedGenreIds = getSelectedGenreIds(); // ✅ แปลงค่าเป็น List<int>
-    print("Selected Genres: $selectedGenreIds"); // ✅ ตรวจสอบค่า
-
+    final selectedGenreId = genreMap[_selectedGenre ?? ''] ?? 0;
     final response = await http.post(
       Uri.parse('http://192.168.1.40:3000/novel'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode({
         'novel_name': _nameController.text,
         'novel_penname': _authorController.text,
-        'novel_type_id': getSelectedGenreIds(), // ✅ เปลี่ยนเป็น List<int>
+        'novel_type_id': selectedGenreId,
         "novel_img": _imageBase64
       }),
     );
@@ -74,14 +66,13 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
       fetchNovels();
       _nameController.clear();
       _authorController.clear();
-      _selectedGenres = [];
+      _selectedGenre = null;
     }
   }
 
-
-
   Future<void> _pickImage() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile = await ImagePicker().pickImage(
+        source: ImageSource.gallery);
     if (pickedFile != null) {
       final bytes = await pickedFile.readAsBytes();
       setState(() {
@@ -95,10 +86,8 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'นิยายของฉัน',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
+        title: Text('นิยายของฉัน',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.deepPurpleAccent,
         flexibleSpace: Container(
           decoration: BoxDecoration(
@@ -117,7 +106,8 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
           children: [
             Card(
               elevation: 6,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
               child: Padding(
                 padding: EdgeInsets.all(20),
                 child: Column(
@@ -129,9 +119,12 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
                         labelStyle: TextStyle(color: Colors.deepPurpleAccent),
                         errorText: _nameError,
                         focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.deepPurpleAccent),
+                          borderSide: BorderSide(color: Colors
+                              .deepPurpleAccent),
                           borderRadius: BorderRadius.circular(12),
                         ),
+                        prefixIcon: Icon(
+                            Icons.book, color: Colors.deepPurpleAccent),
                       ),
                     ),
                     SizedBox(height: 16),
@@ -142,54 +135,106 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
                         labelStyle: TextStyle(color: Colors.deepPurpleAccent),
                         errorText: _authorError,
                         focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.deepPurpleAccent),
+                          borderSide: BorderSide(color: Colors
+                              .deepPurpleAccent),
                           borderRadius: BorderRadius.circular(12),
                         ),
+                        prefixIcon: Icon(
+                            Icons.person, color: Colors.deepPurpleAccent),
                       ),
                     ),
                     SizedBox(height: 16),
-                    MultiSelectDialogField(
-                      items: genres.map((genre) => MultiSelectItem(genre, genre)).toList(),
-                      title: Text('เลือกแนวนิยาย', style: TextStyle(color: Colors.deepPurpleAccent)),
-                      selectedColor: Colors.deepPurpleAccent,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(4),
+                    DropdownButtonFormField<String>(
+                      value: _selectedGenre,
+                      decoration: InputDecoration(
+                        labelText: 'เลือกแนวนิยาย',
+                        labelStyle: TextStyle(color: Colors.deepPurpleAccent),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        prefixIcon: Icon(
+                            Icons.category, color: Colors.deepPurpleAccent),
                       ),
-                      onConfirm: (values) {
+                      items: genres.map((genre) {
+                        return DropdownMenuItem<String>(
+                          value: genre,
+                          child: Text(genre),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
                         setState(() {
-                          _selectedGenres = values.cast<String>();
+                          _selectedGenre = value;
                         });
                       },
                     ),
-                    SizedBox(height: 5),
+                    SizedBox(height: 15),
                     Row(
                       children: [
-                        _image != null
-                            ? Image.file(_image!, width: 100, height: 100, fit: BoxFit.cover)
-                            : Icon(Icons.image, size: 100, color: Colors.grey),
-                        SizedBox(width: 10),
-                        ElevatedButton(
+                        Container(
+                          width: 100,
+                          height: 100,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.deepPurpleAccent, width: 2),
+                          ),
+                          child: _image != null
+                              ? ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Center(
+                              child: Image.file(
+                                _image!,
+                                width: double.infinity,
+                                height: double.infinity,
+                                fit: BoxFit.cover, // Full frame image
+                              ),
+                            ),
+                          )
+                              : Center(
+                            child: Icon(
+                              Icons.image,
+                              size: 50,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 16),
+                        ElevatedButton.icon(
                           onPressed: _pickImage,
-                          child: Text('อัปโหลดปก'),
+                          icon: Icon(Icons.upload_file, size: 20),
+                          label: Text(
+                            'อัปโหลดปก',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.deepPurpleAccent,
-                            foregroundColor: Colors.white,
                             padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            backgroundColor: Color(0xFF9c4dcc), // Light purple
+                            foregroundColor: Colors.white,
+                            elevation: 5,
+                            side: BorderSide(color: Color(0xff9000ea), width: 2),
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 10),
-                    ElevatedButton(
-                      onPressed: addNovelToServer,
-                      child: Text('สร้างนิยาย', style: TextStyle(fontSize: 16)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    SizedBox(height: 0),
+                    Align(
+                      alignment: Alignment(0.28, 0),
+                      child: ElevatedButton(
+                        onPressed: addNovelToServer,
+                        child: Text(
+                          'สร้างนิยาย',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 11, horizontal: 30),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          elevation: 8,
+                          shadowColor: Colors.greenAccent.withOpacity(0.5),
+                          backgroundColor: Color(0xff3bc82a), // Light green
+                          side: BorderSide(color: Color(0xe200b103), width: 2),
+                          foregroundColor: Colors.white,
+                        ),
                       ),
                     ),
                   ],
@@ -199,16 +244,58 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
             SizedBox(height: 20),
             Text(
               'นิยายที่คุณสร้าง',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.deepPurpleAccent),
+              style: TextStyle(fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.deepPurpleAccent),
             ),
             SizedBox(height: 10),
             Expanded(
-              child: ListView.builder(
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 8.0,
+                  mainAxisSpacing: 8.0,
+                  childAspectRatio: 0.75,
+                ),
                 itemCount: novels.length,
                 itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(novels[index]['name']),
-                    subtitle: Text('โดย: ${novels[index]['author']}'),
+                  return Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _image != null
+                            ? Image.memory(
+                          base64Decode(novels[index]['novel_img']),
+                          height: 150,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        )
+                            : Image.asset(
+                          'assets/placeholder.png',
+                          height: 150,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            novels[index]['novel_name'],
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Text(
+                            'โดย: ${novels[index]['novel_penname']}',
+                            style: TextStyle(color: Colors.grey[600]),
+                          ),
+                        ),
+                      ],
+                    ),
                   );
                 },
               ),
