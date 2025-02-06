@@ -1,4 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:cached_network_image/cached_network_image.dart';
+import 'noveldeteilpage.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -6,176 +10,100 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final TextEditingController _searchController = TextEditingController();
-
-  // ข้อมูลนิยาย (มีรูป)
-  final List<Map<String, String>> _novels = [
-    {'title': 'Solo', 'image': 'assets/novel1.jpg'},
-    {'title': 'รักวัยเรียน', 'image': 'assets/novel2.jpg'},
-    {'title': 'สืบสวนลึกลับ', 'image': 'assets/novel3.jpg'},
-    {'title': 'แอ็กชันต่อสู้', 'image': 'assets/novel4.jpg'},
-    {'title': 'โลกอนาคตไซไฟ', 'image': 'assets/novel5.jpg'},
-    {'title': 'ชีวิตดราม่า', 'image': 'assets/novel6.jpg'},
-  ];
-
-  // รายการหมวดหมู่
-  final List<String> _categories = [
-    'ทั้งหมด', 'แฟนตาซี', 'รักโรแมนติก', 'สืบสวน', 'แอ็กชัน', 'ไซไฟ', 'ดราม่า'
-  ];
-
-  List<Map<String, String>> _filteredNovels = [];
-  String _selectedCategory = 'ทั้งหมด';
+  List<Map<String, dynamic>> _novels = [];
 
   @override
   void initState() {
     super.initState();
-    _filteredNovels = List.from(_novels);
+    fetchNovels();
   }
 
-  // ฟังก์ชันค้นหานิยาย (รองรับภาษาไทย)
-  void _filterNovels(String query) {
-    setState(() {
-      _filteredNovels = _novels
-          .where((novel) =>
-          novel['title']!.toLowerCase().contains(query.toLowerCase()))
-          .toList();
-    });
-  }
+  // ดึงข้อมูลนิยายจาก API
+  Future<void> fetchNovels() async {
+    try {
+      final response = await http.get(Uri.parse("http://192.168.1.40:3000/novel"));
 
-  // ฟังก์ชันเปลี่ยนหมวดหมู่
-  void _filterByCategory(String category) {
-    setState(() {
-      _selectedCategory = category;
-      if (category == 'ทั้งหมด') {
-        _filteredNovels = List.from(_novels);
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+        setState(() {
+          _novels = data.map((novel) => {
+            'title': novel['novel_name'].toString(),
+            'description': novel['description'] ?? 'ไม่มีคำอธิบาย',
+            'image': novel['novel_img'] != null && novel['novel_img'].toString().isNotEmpty
+                ? "http://192.168.1.40:3000/uploads/${novel['novel_img']}" // ใช้ URL ของเซิร์ฟเวอร์
+                : 'https://via.placeholder.com/150', // รูปสำรอง
+          }).toList();
+        });
       } else {
-        _filteredNovels = _novels
-            .where((novel) => novel['title']!.contains(category))
-            .toList();
+        throw Exception("Failed to load novels");
       }
-    });
+    } catch (e) {
+      print("Error fetching novels: $e");
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'หน้าหลัก',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
+        title: Text('รายการนิยาย', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.deepPurpleAccent,
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFF5e35b1), Color(0xFF9c27b0)],
-            ),
-          ),
-        ),
       ),
-
-      body: Column(
-        children: [
-          // ช่องค้นหานิยาย
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            child: TextField(
-              controller: _searchController,
-              onChanged: _filterNovels,
-              decoration: InputDecoration(
-                hintText: 'ค้นหานิยาย...',
-                contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 15),
-                prefixIcon: Icon(Icons.search, color: Colors.blue),
-                filled: true,
-                fillColor: Colors.grey[200],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
+      body: _novels.isEmpty
+          ? Center(child: CircularProgressIndicator())
+          : Padding(
+        padding: EdgeInsets.all(8),
+        child: GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 8.0,
+            mainAxisSpacing: 8.0,
+            childAspectRatio: 0.75,
           ),
-
-          // ปุ่มหมวดหมู่ (แนวนอน)
-          Container(
-            height: 50,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              itemCount: _categories.length,
-              itemBuilder: (context, index) {
-                String category = _categories[index];
-                bool isSelected = category == _selectedCategory;
-                return Padding(
-                  padding: EdgeInsets.only(right: 8),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isSelected ? Color(0xFF9733ee) : Colors.white,
-                      foregroundColor: isSelected ? Colors.white : Color(0xFF9733ee),//สี text
-                      padding: EdgeInsets.symmetric(horizontal: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        side: BorderSide(color: Color(0XFF9733ff)),
+          itemCount: _novels.length,
+          itemBuilder: (context, index) {
+            return InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NovelDetailPage(
+                      title: _novels[index]['title'],
+                      description: _novels[index]['description'],
+                      imageUrl: _novels[index]['image'],
+                    ),
+                  ),
+                );
+              },
+              child: Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CachedNetworkImage(
+                      imageUrl: _novels[index]['image'],
+                      height: 150,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                      errorWidget: (context, url, error) => Icon(Icons.error, size: 50, color: Colors.red),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        _novels[index]['title'],
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    onPressed: () => _filterByCategory(category),
-                    child: Text(category, style: TextStyle(fontSize: 16)),
-                  ),
-                );
-              },
-            ),
-          ),
-
-          // GridView ของนิยาย
-          Expanded(
-            child: _filteredNovels.isEmpty
-                ? Center(child: Text('ไม่มีนิยายที่ตรงกับคำค้นหา', style: TextStyle(fontSize: 16, color: Colors.grey)))
-                : GridView.builder(
-              padding: EdgeInsets.all(10),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3, // แสดง ... นิยายในแต่ละแถว
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                childAspectRatio: 0.7,
+                  ],
+                ),
               ),
-              itemCount: _filteredNovels.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  elevation: 3,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // รูปนิยาย
-                      Expanded(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-                          child: Image.asset(
-                            _filteredNovels[index]['image']!,
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                          ),
-                        ),
-                      ),
-                      // ชื่อเรื่อง
-                      Padding(
-                        padding: EdgeInsets.all(8),
-                        child: Text(
-                          _filteredNovels[index]['title']!,
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
+            );
+          },
+        ),
       ),
     );
   }

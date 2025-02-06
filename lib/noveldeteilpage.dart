@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 
 class NovelDetailPage extends StatefulWidget {
-  final String bookTitle;
-  NovelDetailPage({required this.bookTitle});
+
+  final String title;
+  final String description;
+  final String imageUrl;
+
+  NovelDetailPage({required this.title, required this.description, required this.imageUrl});
 
   @override
   _NovelDetailPageState createState() => _NovelDetailPageState();
@@ -14,9 +18,9 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
   @override
   void initState() {
     super.initState();
-    // Initialize the controller with the book title
-    _controller = TextEditingController(text: widget.bookTitle);
+    _controller = TextEditingController(text: widget.title);
   }
+
 
   @override
   void dispose() {
@@ -28,7 +32,7 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("รายละเอียดของ ${widget.bookTitle}"),
+        title: Text("รายละเอียดของ ${widget.title}"),
         backgroundColor: Colors.grey[300],
         centerTitle: true,
       ),
@@ -37,46 +41,21 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Image.network(widget.imageUrl, height: 200, width: double.infinity, fit: BoxFit.cover),
+            SizedBox(height: 20),
             Text(
-              widget.bookTitle,
+              widget.title,
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 20),
-            TextField(
-              controller: _controller,
-              decoration: InputDecoration(
-                hintText: "กรอกเนื้อหาของเล่มนี้",
-                border: OutlineInputBorder(),
-              ),
-              maxLines: 10,
-            ),
-            Spacer(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    // บันทึกเนื้อหาหรือชื่อเล่มใหม่ที่แก้ไข
-                    String updatedContent = _controller.text;
-                    // คุณสามารถทำการบันทึกข้อมูลใหม่ที่นี่ (เช่น อัปเดตข้อมูลในฐานข้อมูลหรือแสดงผลอื่น ๆ)
-                    Navigator.pop(context, updatedContent); // ปิดหน้าและส่งค่ากลับ
-                  },
-                  child: Text("บันทึก"),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                ),
-                SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    // เพิ่มฟังก์ชันการอัปโหลด (เช่น การส่งข้อมูลไปยังเซิร์ฟเวอร์)
-                  },
-                  child: Text("อัปโหลด"),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-                ),
-              ],
+            SizedBox(height: 10),
+            Text(
+              widget.description,
+              style: TextStyle(fontSize: 16),
             ),
           ],
         ),
       ),
     );
   }
+
 }

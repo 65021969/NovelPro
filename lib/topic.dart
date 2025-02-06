@@ -8,7 +8,7 @@ class NavigationUI extends StatefulWidget {
 }
 
 class _NavigationUIState extends State<NavigationUI> {
-  List<String> books = [];
+  List<Map<String, String>> books = []; // เปลี่ยนจาก List<String> เป็น List<Map>
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,7 @@ class _NavigationUIState extends State<NavigationUI> {
         itemBuilder: (context, index) {
           return ListTile(
             title: Text(
-              books[index],
+              books[index]['title'] ?? "ไม่มีชื่อเรื่อง",
               style: TextStyle(fontWeight: FontWeight.bold, decoration: TextDecoration.underline),
             ),
             onTap: () async {
@@ -32,7 +32,11 @@ class _NavigationUIState extends State<NavigationUI> {
               await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => NovelDetailPage(bookTitle: books[index]),
+                  builder: (context) => NovelDetailPage(
+                    title: books[index]['title'] ?? "ไม่มีชื่อเรื่อง",
+                    description: books[index]['description'] ?? "ไม่มีคำอธิบาย",
+                    imageUrl: books[index]['imageUrl'] ?? "https://via.placeholder.com/150",
+                  ),
                 ),
               );
             },
@@ -41,13 +45,13 @@ class _NavigationUIState extends State<NavigationUI> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
-          String? newBook = await Navigator.push(
+          Map<String, String>? newBook = await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => AddnovelPage(bookNumber: books.length + 1),
             ),
           );
-          if (newBook != null && newBook.isNotEmpty) {
+          if (newBook != null) {
             setState(() {
               books.add(newBook);
             });
