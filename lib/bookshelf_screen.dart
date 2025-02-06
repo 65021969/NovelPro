@@ -7,24 +7,21 @@ class BookshelfScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-       title: Text(
-        'ชั้นหนังสือ',
-      style: TextStyle(
-        fontSize: 22,
-        fontWeight: FontWeight.bold,
-        color: Colors.white, // เปลี่ยนสีข้อความใน AppBar เป็นสีขาว
-      ),
-    ),
-        flexibleSpace: Container(
-         decoration: BoxDecoration(
-           gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF396afc), Color(0xFF2948ff)], // ไล่สีจาก #396afc ไป #2948ff
-            ),
+        title: Text(
+          'ชั้นหนังสือ',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
-       ),
-    ),
+        backgroundColor: Colors.deepPurpleAccent,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF5e35b1), Color(0xFF9c27b0)],
+            ),
+          ),
+        ),
+      ),
       body: GridView.builder(
         padding: EdgeInsets.all(16),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

@@ -3,7 +3,6 @@ import 'bookshelf_screen.dart';
 import 'home_screen.dart';
 import 'my_novels_screen.dart';
 import 'settings_screen.dart';
-import 'my_novels_screen.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -30,17 +29,32 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        selectedItemColor: Color(0xFF6A5ACD),
-        unselectedItemColor: Colors.grey,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.library_books), label: 'ชั้นหนังสือ'),
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'หน้าหลัก'),
-          BottomNavigationBarItem(icon: Icon(Icons.book), label: 'นิยายของฉัน'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'ตั้งค่า'),
-        ],
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF396afc), Color(0xFF2948ff)], // ไล่สีม่วงเหมือนกับ AppBar
+          ),
+          border: Border(
+            top: BorderSide(
+              color: Colors.deepPurpleAccent, // สีเส้นขอบด้านบน
+              width: 1.0, // ความหนาของเส้นขอบ
+            ),
+          ),
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          selectedItemColor: Colors.deepPurple,
+          unselectedItemColor: Colors.grey,
+          items: [
+            BottomNavigationBarItem(icon: Icon(Icons.library_books), label: 'ชั้นหนังสือ'),
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'หน้าหลัก'),
+            BottomNavigationBarItem(icon: Icon(Icons.book), label: 'นิยายของฉัน'),
+            BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'ตั้งค่า'),
+          ],
+        ),
       ),
     );
   }

@@ -61,19 +61,16 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'นิยายทั้งหมด',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: Colors.white, // เปลี่ยนสีข้อความใน AppBar เป็นสีขาว
-          ),
+          'หน้าหลัก',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
+        backgroundColor: Colors.deepPurpleAccent,
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFF396afc), Color(0xFF2948ff)], // ไล่สีจาก #396afc ไป #2948ff
+              colors: [Color(0xFF5e35b1), Color(0xFF9c27b0)],
             ),
           ),
         ),
@@ -138,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 : GridView.builder(
               padding: EdgeInsets.all(10),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2, // แสดง ... นิยายในแต่ละแถว
+                crossAxisCount: 3, // แสดง ... นิยายในแต่ละแถว
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
                 childAspectRatio: 0.7,

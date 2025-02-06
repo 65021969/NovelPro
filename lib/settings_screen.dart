@@ -6,13 +6,17 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('ตั้งค่า', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), // สีข้อความเป็นขาว
+        title: Text(
+          'การตั้งค่า',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.deepPurpleAccent,
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFF396afc), Color(0xFF2948ff)], // ไล่สีจาก #396afc ไป #2948ff
+              colors: [Color(0xFF5e35b1), Color(0xFF9c27b0)],
             ),
           ),
         ),
