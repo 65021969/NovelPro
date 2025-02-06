@@ -22,119 +22,129 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('กรุณากรอกอีเมลและรหัสผ่าน')),
+        SnackBar(
+          content: Text('กรุณากรอกอีเมลและรหัสผ่าน'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.redAccent,
+        ),
       );
     }
-  }
-
-  Widget _buildSocialLoginButton(String text, IconData icon, Color color) {
-    return SizedBox(
-      width: 180,
-      child: ElevatedButton.icon(
-        onPressed: () {}, // เพิ่มการเข้าสู่ระบบภายหลัง
-        icon: Icon(icon, color: Colors.white),
-        label: Text(text, style: TextStyle(fontSize: 14)),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          padding: EdgeInsets.symmetric(vertical: 12),
-        ),
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: EdgeInsets.all(20),
-        child: SingleChildScrollView(
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // เพิ่มระยะห่างก่อนเนื้อหาหลัก
-                SizedBox(height: 80), // ระยะห่างจากด้านบน
-
-                Image.asset('assets/logo1.png', height: 100), // โลโก้
-                SizedBox(height: 10),
-                Text('เข้าสู่ระบบ', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.blue)),
-                SizedBox(height: 20),
-                TextField(
-                  controller: _emailController,
-                  decoration: InputDecoration(
-                    labelText: 'Username',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                    prefixIcon: Icon(Icons.email),
-                    contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                  ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF5e35b1), Color(0xFF9c27b0)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.all(20),
+            child: Card(
+              elevation: 4, // ลดเงาให้ดูเรียบง่าย
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Color.fromRGBO(255, 255, 255, 0.9), // ใช้ความโปร่งใส 90%
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                SizedBox(height: 10),
-                TextField(
-                  controller: _passwordController,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                    prefixIcon: Icon(Icons.lock),
-                    contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                  ),
-                  obscureText: true,
-                ),
-                SizedBox(height: 5),
-                // ปุ่มลืมรหัสผ่านใต้ช่องรหัสผ่าน
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                      // ใส่ลอจิกสำหรับลืมรหัสผ่าน
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('กรุณาติดต่อผู้ดูแลระบบเพื่อรีเซ็ตรหัสผ่าน')),
-                      );
-                    },
-                    child: Text('ลืมรหัสผ่าน?', style: TextStyle(fontSize: 14, color: Colors.blue.shade700)),
-                  ),
-                ),
-                SizedBox(height: 20),
-                SizedBox(
-                  width: 220,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _login,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue.shade700,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      elevation: 3,
-                    ),
-                    child: Text('เข้าสู่ระบบ', style: TextStyle(fontSize: 18)),
-                  ),
-                ),
-                SizedBox(height: 25),
-                Text('หรือเข้าสู่ระบบด้วย', style: TextStyle(fontSize: 16, color: Colors.grey[700])),
-                SizedBox(height: 15),
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  alignment: WrapAlignment.center,
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    _buildSocialLoginButton('Google', Icons.g_mobiledata, Colors.red),
-                    _buildSocialLoginButton('Facebook', Icons.facebook, Colors.blue),
-                    _buildSocialLoginButton('Apple ID', Icons.apple, Colors.black),
-                    _buildSocialLoginButton('Line', Icons.message, Colors.green),
+                    ClipOval(
+                      child: Image.asset(
+                        'assets/logo1.png',
+                        height: 100,
+                        width: 100,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      'เข้าสู่ระบบ',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF5e35b1),
+                      ),
+                    ),
+                    SizedBox(height: 30),
+                    TextField(
+                      controller: _emailController,
+                      decoration: InputDecoration(
+                        labelText: 'Username',
+                        labelStyle: TextStyle(color: Color(0xFF5e35b1)),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        prefixIcon: Icon(Icons.email, color: Color(0xFF5e35b1)),
+                        contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    TextField(
+                      controller: _passwordController,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        labelStyle: TextStyle(color: Color(0xFF5e35b1)),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        prefixIcon: Icon(Icons.lock, color: Color(0xFF5e35b1)),
+                        contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                      ),
+                      obscureText: true,
+                    ),
+                    SizedBox(height: 20),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('กรุณาติดต่อผู้ดูแลระบบเพื่อรีเซ็ตรหัสผ่าน'),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        },
+                        child: Text('ลืมรหัสผ่าน?', style: TextStyle(fontSize: 14, color: Color(0xFF9c27b0))),
+                      ),
+                    ),
+                    SizedBox(height: 30),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: _login,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF5e35b1),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          elevation: 2, // ลดเงาเพื่อให้ดูเรียบ
+                        ),
+                        child: Text('เข้าสู่ระบบ', style: TextStyle(fontSize: 18)),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Divider(thickness: 1, color: Colors.grey[300]),
+                    SizedBox(height: 10),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => RegisterScreen()),
+                        );
+                      },
+                      child: Text(
+                        'สมัครสมาชิก',
+                        style: TextStyle(fontSize: 16, color: Color(0xFF9c27b0), fontWeight: FontWeight.bold),
+                      ),
+                    ),
                   ],
                 ),
-                SizedBox(height: 20),
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => RegisterScreen()),
-                    );
-                  },
-                  child: Text('สมัครสมาชิก', style: TextStyle(fontSize: 16, color: Colors.blue.shade700)),
-                ),
-              ],
+              ),
             ),
           ),
         ),
