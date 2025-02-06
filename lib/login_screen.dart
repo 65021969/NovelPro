@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:ssssswwww/register_screen.dart';
-import 'dart:convert';
 import 'main_screen.dart';
+import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -13,60 +11,30 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  void _login() async {
+  void _login() {
     String email = _emailController.text;
     String password = _passwordController.text;
 
     if (email.isNotEmpty && password.isNotEmpty) {
-      final response = await http.post(
-        Uri.parse('http://localhost:3000/login'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode({
-          'email': email,
-          'password': password,
-        }),
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => MainScreen()),
       );
-
-      final data = jsonDecode(response.body);
-
-      if (response.statusCode == 200) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => MainScreen()),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(data['message'])),
-        );
-      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('กรุณากรอกข้อมูลให้ครบถ้วน')),
+        SnackBar(
+          content: Text('กรุณากรอกอีเมลและรหัสผ่าน'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.redAccent,
+        ),
       );
     }
-  }
-
-  Widget _buildTextField(TextEditingController controller, String label, IconData icon, {bool obscure = false}) {
-    return TextField(
-      controller: controller,
-      obscureText: obscure,
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(color: Color(0xFF5e35b1)),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        prefixIcon: Icon(icon, color: Color(0xFF5e35b1)),
-        contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [Color(0xFF5e35b1), Color(0xFF9c27b0)],
@@ -78,11 +46,11 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Padding(
             padding: EdgeInsets.all(20),
             child: Card(
-              elevation: 4,
+              elevation: 4, // ลดเงาให้ดูเรียบง่าย
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Color.fromRGBO(255, 255, 255, 0.9),
+                  color: Color.fromRGBO(255, 255, 255, 0.9), // ใช้ความโปร่งใส 90%
                   borderRadius: BorderRadius.circular(16),
                 ),
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 30),
@@ -101,18 +69,52 @@ class _LoginScreenState extends State<LoginScreen> {
                     Text(
                       'เข้าสู่ระบบ',
                       style: TextStyle(
-                        fontSize: 26,
+                        fontSize: 28,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF5e35b1),
                       ),
                     ),
                     SizedBox(height: 30),
-                    _buildTextField(_emailController, 'Email', Icons.email),
+                    TextField(
+                      controller: _emailController,
+                      decoration: InputDecoration(
+                        labelText: 'Username',
+                        labelStyle: TextStyle(color: Color(0xFF5e35b1)),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        prefixIcon: Icon(Icons.email, color: Color(0xFF5e35b1)),
+                        contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                      ),
+                    ),
                     SizedBox(height: 20),
-                    _buildTextField(_passwordController, 'Password', Icons.lock, obscure: true),
+                    TextField(
+                      controller: _passwordController,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        labelStyle: TextStyle(color: Color(0xFF5e35b1)),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        prefixIcon: Icon(Icons.lock, color: Color(0xFF5e35b1)),
+                        contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                      ),
+                      obscureText: true,
+                    ),
+                    SizedBox(height: 20),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('กรุณาติดต่อผู้ดูแลระบบเพื่อรีเซ็ตรหัสผ่าน'),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        },
+                        child: Text('ลืมรหัสผ่าน?', style: TextStyle(fontSize: 14, color: Color(0xFF9c27b0))),
+                      ),
+                    ),
                     SizedBox(height: 30),
                     SizedBox(
-                      width: 220,
+                      width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
                         onPressed: _login,
@@ -120,22 +122,25 @@ class _LoginScreenState extends State<LoginScreen> {
                           backgroundColor: Color(0xFF5e35b1),
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          elevation: 3,
+                          elevation: 2, // ลดเงาเพื่อให้ดูเรียบ
                         ),
                         child: Text('เข้าสู่ระบบ', style: TextStyle(fontSize: 18)),
                       ),
                     ),
                     SizedBox(height: 20),
-                    Divider(thickness: 1, color: Colors.grey[400]),
+                    Divider(thickness: 1, color: Colors.grey[300]),
                     SizedBox(height: 10),
                     TextButton(
                       onPressed: () {
-                        Navigator.pushReplacement(
+                        Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => RegisterScreen()),
                         );
                       },
-                      child: Text('สมัครสมาชิก', style: TextStyle(fontSize: 16, color: Color(0xFF9c27b0))),
+                      child: Text(
+                        'สมัครสมาชิก',
+                        style: TextStyle(fontSize: 16, color: Color(0xFF9c27b0), fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ],
                 ),

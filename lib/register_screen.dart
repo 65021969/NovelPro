@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'main_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -14,7 +12,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
 
-  void _register() async {
+  void _register() {
     String name = _nameController.text;
     String email = _emailController.text;
     String password = _passwordController.text;
@@ -22,33 +20,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (name.isNotEmpty && email.isNotEmpty && password.isNotEmpty && confirmPassword.isNotEmpty) {
       if (password == confirmPassword) {
-        final response = await http.post(
-          Uri.parse('http://localhost:3000/register'),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-          body: jsonEncode({
-            'name': name,
-            'email': email,
-            'password': password,
-          }),
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => MainScreen()),
         );
-
-        final data = jsonDecode(response.body);
-
-        if (response.statusCode == 201) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(data['message'])),
-          );
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => MainScreen()),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(data['message'])),
-          );
-        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('รหัสผ่านไม่ตรงกัน')),
@@ -79,10 +54,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        height: MediaQuery.of(context).size.height,
+        height: MediaQuery.of(context).size.height, // ใช้ MediaQuery เพื่อให้พื้นหลังเต็มจอ
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF5e35b1), Color(0xFF9c27b0)],
+            colors: [Color(0xFF5e35b1), Color(0xFF9c27b0)], // สีพื้นหลังไล่สี
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -91,11 +66,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: Padding(
             padding: EdgeInsets.all(20),
             child: Card(
-              elevation: 4,
+              elevation: 4, // เงาของการ์ดให้ดูเบา
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Color.fromRGBO(255, 255, 255, 0.9),
+                  color: Color.fromRGBO(255, 255, 255, 0.9), // ใช้โปร่งใส 90%
                   borderRadius: BorderRadius.circular(16),
                 ),
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 30),
