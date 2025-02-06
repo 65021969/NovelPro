@@ -50,15 +50,17 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
   Future<void> fetchNovels() async {
     final response = await http.get(Uri.parse('http://192.168.1.40:3000/novel'));
     if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      print("Fetched Novels: $data"); // ✅ ตรวจสอบโครงสร้างข้อมูลที่ดึงมา
       setState(() {
         novels = List<Map<String, dynamic>>.from(json.decode(response.body));
       });
     }
   }
-
+  //แสดงข้อมูลนิยายจากserver
   Future<void> addNovelToServer() async {
-    final selectedGenreIds = getSelectedGenreIds(); // ✅ แปลงค่าเป็น List<int>
-    print("Selected Genres: $selectedGenreIds"); // ✅ ตรวจสอบค่า
+    final selectedGenreIds = getSelectedGenreIds();
+    print("Selected Genres: $selectedGenreIds");
 
     final response = await http.post(
       Uri.parse('http://192.168.1.40:3000/novel'),
@@ -66,17 +68,23 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
       body: json.encode({
         'novel_name': _nameController.text,
         'novel_penname': _authorController.text,
-        'novel_type_id': getSelectedGenreIds(), // ✅ เปลี่ยนเป็น List<int>
+        'novel_type_id': selectedGenreIds,
         "novel_img": _imageBase64
       }),
     );
+
     if (response.statusCode == 201) {
-      fetchNovels();
       _nameController.clear();
       _authorController.clear();
       _selectedGenres = [];
+
+      await fetchNovels(); // ดึงข้อมูลใหม่หลังจากเพิ่มนิยาย
+      setState(() {}); // รีเฟรช UI
     }
   }
+
+
+
 
 
 
@@ -203,12 +211,29 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
             ),
             SizedBox(height: 10),
             Expanded(
-              child: ListView.builder(
+              child: novels.isEmpty
+                  ? Center(child: Text('ยังไม่มีนิยาย', style: TextStyle(color: Colors.grey)))
+                  : ListView.builder(
                 itemCount: novels.length,
                 itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(novels[index]['name']),
-                    subtitle: Text('โดย: ${novels[index]['author']}'),
+                  final novel = novels[index]; // ดึงข้อมูลนิยายแต่ละรายการ
+                  return Card(
+                    elevation: 3,
+                    margin: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    child: ListTile(
+                      leading: novel['novel_img'] != null
+                          ? Image.memory(
+                        base64Decode(novel['novel_img']),
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover,
+                      )
+                          : Icon(Icons.book, size: 50, color: Colors.deepPurpleAccent),
+                      title: Text(novel['novel_name'], style: TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text('โดย: ${novel['novel_penname']}'),
+                      trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                    ),
                   );
                 },
               ),
