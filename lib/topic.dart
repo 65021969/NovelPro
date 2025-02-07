@@ -33,9 +33,12 @@ class _NavigationUIState extends State<NavigationUI> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => NovelDetailPage(
+                    // novelId: books[index]['novel_id'] ?? "ไม่มีชื่อเรื่อง",
                     title: books[index]['title'] ?? "ไม่มีชื่อเรื่อง",
+                    type: books[index]['type'] ?? "ไม่มีชื่อเรื่อง",
+                    penname:books[index]['penname'] ?? "ไม่มีชื่อเรื่อง",
                     description: books[index]['description'] ?? "ไม่มีคำอธิบาย",
-                    imageUrl: books[index]['imageUrl'] ?? "https://via.placeholder.com/150",
+                    imageUrl: books[index]['imageUrl'] ?? "https://via.placeholder.com/150", novelId: null,
                   ),
                 ),
               );
