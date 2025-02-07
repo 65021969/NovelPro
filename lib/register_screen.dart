@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'main_screen.dart';
+import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -14,9 +15,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
 
-  bool _isLoading = false; // ใช้สำหรับแสดง Loading
+  bool _isLoading = false;
 
-  // 🛠️ ฟังก์ชันสมัครสมาชิก
   Future<void> _register() async {
     String name = _nameController.text.trim();
     String email = _emailController.text.trim();
@@ -38,7 +38,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     try {
-      var url = Uri.parse("http://192.168.1.40:3000/register"); // 🔥 เปลี่ยนเป็น URL ของ Backend คุณ
+      var url = Uri.parse("http://192.168.105.101:3000/register");
       var response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
@@ -52,8 +52,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       var data = jsonDecode(response.body);
 
       if (response.statusCode == 201) {
-        _showMessage("สมัครสมาชิกสำเร็จ!");
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainScreen()));
+        _showSuccessDialog();
       } else {
         _showMessage(data["message"] ?? "เกิดข้อผิดพลาดในการสมัครสมาชิก");
       }
@@ -66,12 +65,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  // 🛠️ ฟังก์ชันแสดง Snackbar
   void _showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  // 🛠️ ฟังก์ชันสร้างช่องกรอกข้อมูล
   Widget _buildTextField(TextEditingController controller, String label, IconData icon, {bool obscure = false}) {
     return TextField(
       controller: controller,
@@ -85,6 +82,64 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
     );
   }
+
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(color: Color(0xFF5e35b1), width: 2),
+          ),
+          title: Column(
+            children: [
+              Image.asset(
+                'assets/check.png',
+                height: 50,
+                width: 50,
+              ),
+              SizedBox(height: 10),
+              Text('สมัครสมาชิกสำเร็จ', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          actions: <Widget>[
+            Center(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  gradient: LinearGradient(
+                    colors: [Color(0xFF5e35b1), Color(0xFF9c27b0)], // สีไล่จากม่วงไปม่วงอ่อน
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                ),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginScreen()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent, // ทำให้พื้นหลังของปุ่มโปร่งใส
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30), // ปรับขนาดปุ่ม
+                    elevation: 0, // ไม่มีเงาในปุ่ม
+                  ),
+                  child: Text(
+                    'ตกลง',
+                    style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold), // ปรับขนาดตัวอักษร
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -135,20 +190,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     SizedBox(height: 20),
                     _buildTextField(_confirmPasswordController, 'Confirm Password', Icons.lock, obscure: true),
                     SizedBox(height: 30),
-                    SizedBox(
-                      width: 220,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: _isLoading ? null : _register,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF5e35b1),
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          elevation: 3,
+                    Align(
+                      alignment: Alignment.center,
+                      child: SizedBox(
+                        width: 220,
+                        height: 60,
+                        child: ElevatedButton(
+                          onPressed: _isLoading ? null : _register,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xFF5e35b1),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            elevation: 5,
+                            padding: EdgeInsets.symmetric(vertical: 15),
+                          ),
+                          child: _isLoading
+                              ? CircularProgressIndicator(color: Colors.white)
+                              : Text('สมัครสมาชิก', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                         ),
-                        child: _isLoading
-                            ? CircularProgressIndicator(color: Colors.white)
-                            : Text('สมัครสมาชิก', style: TextStyle(fontSize: 18)),
                       ),
                     ),
                     SizedBox(height: 20),

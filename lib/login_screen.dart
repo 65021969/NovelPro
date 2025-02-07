@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'main_screen.dart';
 import 'register_screen.dart';
-import 'ForgotPass_Screen.dart'; // ✅ เพิ่ม import หน้า Forgot Password
+import 'ForgotPass_Screen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -11,30 +11,31 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _emailController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
 
   Future<void> _login() async {
-    String email = _emailController.text;
+    String username = _usernameController.text;
     String password = _passwordController.text;
 
-    if (email.isNotEmpty && password.isNotEmpty) {
+    if (username.isNotEmpty && password.isNotEmpty) {
       try {
-        var url = Uri.parse("http://192.168.1.40:3000/login");
+        var url = Uri.parse("http://192.168.105.101:3000/login");
         var response = await http.post(
           url,
           headers: {"Content-Type": "application/json"},
           body: jsonEncode({
-            "user_name": email,
+            "user_name": username,
             "user_pass": password,
           }),
         );
 
         var responseData = jsonDecode(response.body);
         if (response.statusCode == 200) {
-          Navigator.pushReplacement(
+          Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => MainScreen()),
+                (Route<dynamic> route) => false, // This will remove all previous routes
           );
         } else {
           _showError(responseData['message']);
@@ -43,7 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
         _showError("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
       }
     } else {
-      _showError("กรุณากรอกอีเมลและรหัสผ่าน");
+      _showError("กรุณากรอกชื่อผู้ใช้และรหัสผ่าน");
     }
   }
 
@@ -102,12 +103,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     SizedBox(height: 30),
                     TextField(
-                      controller: _emailController,
+                      controller: _usernameController,
                       decoration: InputDecoration(
-                        labelText: 'Email',
+                        labelText: 'Username',
                         labelStyle: TextStyle(color: Color(0xFF5e35b1)),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        prefixIcon: Icon(Icons.email, color: Color(0xFF5e35b1)),
+                        prefixIcon: Icon(Icons.person, color: Color(0xFF5e35b1)),
                         contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                       ),
                     ),
@@ -123,7 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       obscureText: true,
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: 10),
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
@@ -137,19 +138,38 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Text('ลืมรหัสผ่าน?', style: TextStyle(fontSize: 14, color: Color(0xFF9c27b0))),
                       ),
                     ),
-                    SizedBox(height: 30),
+                    SizedBox(height: 10),
                     SizedBox(
-                      width: double.infinity,
-                      height: 50,
+                      width: 200, // กำหนดความกว้างของปุ่มให้เล็กลง
+                      height: 55, // กำหนดความสูงของปุ่มให้เล็กลง
                       child: ElevatedButton(
                         onPressed: _login,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF5e35b1),
-                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.transparent, // ทำให้พื้นหลังปุ่มโปร่งแสง
+                          elevation: 0, // ทำให้ปุ่มไม่มีเงา
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          elevation: 2,
                         ),
-                        child: Text('เข้าสู่ระบบ', style: TextStyle(fontSize: 18)),
+                        child: Ink(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Color(0xFF5e35b1), Color(0xFF9c27b0)], // กำหนดสีไล่
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: Colors.white, // สีของกรอบ
+                              width: 1.1, // ความหนาของกรอบ
+                            ),
+                          ),
+                          child: Container(
+                            alignment: Alignment.center,
+                            child: Text(
+                              'เข้าสู่ระบบ',
+                              style: TextStyle(fontSize: 16, color: Colors.white), // ปรับขนาดตัวอักษรให้เล็กลง
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                     SizedBox(height: 20),
