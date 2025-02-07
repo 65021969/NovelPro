@@ -59,7 +59,7 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
             'novel_img': novel['novel_img'] != null && novel['novel_img']
                 .toString()
                 .isNotEmpty
-                ? "http://192.168.105.101:3000/uploads/${novel['novel_img']}"
+                ? "http://192.168.1.40:3000/uploads/${novel['novel_img']}"
                 : 'https://via.placeholder.com/150', // รูปสำรอง
             'novel_type_name': novel['novel_type_name'] ?? "ไม่ระบุ",
           }).toList();
@@ -86,7 +86,7 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
 
     final request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://192.168.105.101:3000/novel'),
+      Uri.parse('http://192.168.1.40:3000/novel'),
     );
 
     request.fields['novel_name'] = _nameController.text;
@@ -144,6 +144,15 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.deepPurple,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF5e35b1), Color(0xFF9c27b0)],
+            ),
+          ),
+        ),
         elevation: 6,
         centerTitle: true,
       ),

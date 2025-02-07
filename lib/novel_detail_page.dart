@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'addnovelpage.dart'; // เพิ่มการนำเข้าหน้า AddNovelPage
 
 class NovelDetailPage extends StatelessWidget {
   final Map<String, dynamic> novel;
@@ -42,6 +43,19 @@ class NovelDetailPage extends StatelessWidget {
             ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // ส่งข้อมูลนิยายไปยังหน้า AddnovelPage
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddnovelPage(novel: novel),
+            ),
+          );
+        },
+        child: Icon(Icons.add),
+        backgroundColor: Colors.deepPurpleAccent,
       ),
     );
   }

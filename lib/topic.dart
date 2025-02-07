@@ -48,7 +48,7 @@ class _NavigationUIState extends State<NavigationUI> {
           Map<String, String>? newBook = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => AddnovelPage(bookNumber: books.length + 1),
+              builder: (context) => AddnovelPage(novel: {},),
             ),
           );
           if (newBook != null) {
