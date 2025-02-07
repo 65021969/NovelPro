@@ -158,14 +158,15 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
         centerTitle: false,
       ),
       body: Container(
-        color: Color(0xFFE0E0E0), // เพิ่มพื้นหลังสีดำที่นี่
+        width: double.infinity, // เพิ่มการกำหนดความกว้าง
+        height: MediaQuery.of(context).size.height, // เพิ่มการกำหนดความสูง
+        color: Color(0xFFE0E0E0), // พื้นหลังสี
         padding: EdgeInsets.all(16),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
-              /// 🔹 **โซนสร้างนิยาย**
+              // โซนสร้างนิยาย
               Card(
                 elevation: 8,
                 shape: RoundedRectangleBorder(
@@ -202,10 +203,8 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
                   ),
                 ),
               ),
-
-              SizedBox(height: 32),
-
-              /// 🔹 **โซนรายการนิยาย**
+              SizedBox(height: 10),
+              // โซนรายการนิยาย
               Card(
                 elevation: 8,
                 shape: RoundedRectangleBorder(
@@ -329,17 +328,15 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
   }
 
   Widget _buildActionButtons() {
-    // ตัวแปรที่ใช้ควบคุมตำแหน่งของปุ่ม
-    double buttonWidth = 150; // ความกว้างของปุ่ม
-    double buttonHeight = 40; // ความสูงของปุ่ม
-    double positionValue = 0.26; // ใช้ตัวเลขในการควบคุมตำแหน่ง (0.0 = ซ้ายสุด, 1.0 = ขวาสุด, 0.5 = กลาง)
+    double buttonWidth = 150;
+    double buttonHeight = 40;
+    double positionValue = 0.26;
 
     return Row(
       children: [
         Expanded(
           child: Align(
             alignment: Alignment(positionValue, 0),
-            // ใช้ตัวเลขในตัวแปร positionValue
             child: ElevatedButton(
               onPressed: addNovelToServer,
               child: Text(
@@ -363,7 +360,14 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
   }
 
   Widget _buildNovelGrid() {
-    return GridView.builder(
+    return novels.isEmpty
+        ? Center(
+      child: Text(
+        'ไม่มีข้อมูลนิยาย',
+        style: TextStyle(fontSize: 18, color: Colors.grey),
+      ),
+    )
+        : GridView.builder(
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -404,8 +408,8 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
                       width: double.infinity,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
-                        return Icon(Icons.broken_image, size: 50,
-                            color: Colors.grey);
+                        return Icon(
+                            Icons.broken_image, size: 50, color: Colors.grey);
                       },
                     ),
                   ),
@@ -434,3 +438,4 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
     );
   }
 }
+
