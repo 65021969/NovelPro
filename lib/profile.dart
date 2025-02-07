@@ -24,30 +24,74 @@ class _ProfilePageState extends State<ProfilePage> {
     TextEditingController controller = TextEditingController(text: name);
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text("แก้ไขชื่อเล่น"),
-        content: TextField(
-          controller: controller,
-          decoration: InputDecoration(hintText: "ป้อนชื่อใหม่"),
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: 16,
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.edit, size: 60, color: Colors.deepPurpleAccent),
+              SizedBox(height: 20),
+              Text(
+                "แก้ไขชื่อเล่น",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
+              TextField(
+                controller: controller,
+                decoration: InputDecoration(
+                  labelStyle: TextStyle(color: Colors.deepPurpleAccent),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.deepPurpleAccent),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.deepPurpleAccent),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                ),
+              ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey[300],
+                      foregroundColor: Colors.black,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 32),
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                    child: Text("ยกเลิก"),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.deepPurpleAccent,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 32),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        name = controller.text;
+                      });
+                      Navigator.pop(context);
+                    },
+                    child: Text("บันทึก"),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text("ยกเลิก", style: TextStyle(color: Colors.deepPurpleAccent)),
-          ),
-          TextButton(
-            onPressed: () {
-              setState(() {
-                name = controller.text;
-              });
-              Navigator.pop(context);
-            },
-            child: Text("บันทึก", style: TextStyle(color: Colors.deepPurpleAccent)),
-          ),
-        ],
       ),
     );
   }
+
 
   void showChangePasswordDialog() {
     TextEditingController newPasswordController = TextEditingController();
