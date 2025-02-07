@@ -47,7 +47,7 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
   Future<void> fetchNovels() async {
     try {
       final response = await http.get(
-          Uri.parse("http://192.168.1.40:3000/novel"));
+          Uri.parse("http://192.168.105.101:3000/novel"));
 
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
@@ -59,7 +59,7 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
             'novel_img': novel['novel_img'] != null && novel['novel_img']
                 .toString()
                 .isNotEmpty
-                ? "http://192.168.1.40:3000/uploads/${novel['novel_img']}"
+                ? "http://192.168.105.101:3000/uploads/${novel['novel_img']}"
                 : 'https://via.placeholder.com/150', // รูปสำรอง
             'novel_type_name': novel['novel_type_name'] ?? "ไม่ระบุ",
           }).toList();
@@ -86,7 +86,7 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
 
     final request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://192.168.1.40:3000/novel'),
+      Uri.parse('http://192.168.105.101:3000/novel'),
     );
 
     request.fields['novel_name'] = _nameController.text;
@@ -141,7 +141,8 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
       appBar: AppBar(
         title: Text(
           'นิยายของฉัน',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
         ),
         backgroundColor: Colors.deepPurple,
         flexibleSpace: Container(
@@ -154,25 +155,84 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
           ),
         ),
         elevation: 6,
-        centerTitle: true,
+        centerTitle: false,
       ),
-      body: Padding(
+      body: Container(
+        color: Color(0xFFE0E0E0), // เพิ่มพื้นหลังสีดำที่นี่
         padding: EdgeInsets.all(16),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildTextField('ชื่อนิยาย', _nameController, _nameError),
-              SizedBox(height: 16),
-              _buildTextField('นามปากกา', _authorController, _authorError),
-              SizedBox(height: 16),
-              _buildDropdown(),
-              SizedBox(height: 16),
-              _buildImagePicker(),
-              SizedBox(height: 24),
-              _buildActionButtons(),
-              SizedBox(height: 24),
-              _buildNovelGrid(),
+
+              /// 🔹 **โซนสร้างนิยาย**
+              Card(
+                elevation: 8,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                shadowColor: Colors.deepPurple.withOpacity(0.3),
+                child: Padding(
+                  padding: EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Text(
+                          'สร้างนิยายใหม่',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.deepPurple,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      _buildTextField('ชื่อนิยาย', _nameController, _nameError),
+                      SizedBox(height: 16),
+                      _buildTextField(
+                          'นามปากกา', _authorController, _authorError),
+                      SizedBox(height: 16),
+                      _buildDropdown(),
+                      SizedBox(height: 16),
+                      _buildImagePicker(),
+                      SizedBox(height: 24),
+                      _buildActionButtons(),
+                    ],
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 32),
+
+              /// 🔹 **โซนรายการนิยาย**
+              Card(
+                elevation: 8,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                shadowColor: Colors.deepPurple.withOpacity(0.3),
+                child: Padding(
+                  padding: EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Text(
+                          'รายการนิยายของฉัน',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.deepPurple,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      _buildNovelGrid(),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -184,19 +244,20 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
       String? errorText) {
     return TextField(
       controller: controller,
+      style: TextStyle(fontSize: 16),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(color: Colors.deepPurple),
+        labelStyle: TextStyle(color: Colors.deepPurple, fontSize: 16),
         errorText: errorText,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(color: Colors.deepPurple),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(color: Colors.deepPurpleAccent, width: 2),
         ),
-        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
     );
   }
@@ -206,16 +267,16 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
       value: _selectedGenre,
       decoration: InputDecoration(
         labelText: 'เลือกแนวนิยาย',
-        labelStyle: TextStyle(color: Colors.deepPurple),
+        labelStyle: TextStyle(color: Colors.deepPurple, fontSize: 16),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(color: Colors.deepPurple),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(color: Colors.deepPurpleAccent, width: 2),
         ),
-        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
       items: genres.map((genre) =>
           DropdownMenuItem(value: genre, child: Text(genre))).toList(),
@@ -225,15 +286,23 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
 
   Widget _buildImagePicker() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.start, // จัดให้เริ่มจากซ้าย
-      crossAxisAlignment: CrossAxisAlignment.center, // จัดให้อยู่ระดับกลางแนวตั้ง
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
           width: 120,
           height: 120,
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.deepPurple, width: 2),
+            border: Border.all(color: Colors.deepPurple, width: 3),
             borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.deepPurple.withOpacity(0.1),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: Offset(0, 2),
+              ),
+            ],
           ),
           child: _image != null
               ? ClipRRect(
@@ -242,7 +311,7 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
           )
               : Icon(Icons.image, size: 60, color: Colors.deepPurple),
         ),
-        SizedBox(width: 16), // เพิ่มช่องว่างระหว่างภาพและปุ่ม
+        SizedBox(width: 16),
         ElevatedButton.icon(
           onPressed: _pickImage,
           icon: Icon(Icons.upload_file, color: Colors.white),
@@ -250,7 +319,7 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.deepPurple,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(16),
             ),
             padding: EdgeInsets.symmetric(vertical: 14, horizontal: 24),
           ),
@@ -260,22 +329,32 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
   }
 
   Widget _buildActionButtons() {
+    // ตัวแปรที่ใช้ควบคุมตำแหน่งของปุ่ม
+    double buttonWidth = 150; // ความกว้างของปุ่ม
+    double buttonHeight = 40; // ความสูงของปุ่ม
+    double positionValue = 0.26; // ใช้ตัวเลขในการควบคุมตำแหน่ง (0.0 = ซ้ายสุด, 1.0 = ขวาสุด, 0.5 = กลาง)
+
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center, // จัดให้อยู่กลาง
       children: [
-        Flexible(
-          child: ElevatedButton(
-            onPressed: addNovelToServer,
-            child: Text(
-              'สร้างนิยาย',
-              style: TextStyle(fontSize: 16, color: Colors.white),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              padding: EdgeInsets.symmetric(vertical: 14),
-              minimumSize: Size(200, 50), // กำหนดขนาดขั้นต่ำ
-              maximumSize: Size(300, 60), // กำหนดขนาดสูงสุด
+        Expanded(
+          child: Align(
+            alignment: Alignment(positionValue, 0),
+            // ใช้ตัวเลขในตัวแปร positionValue
+            child: ElevatedButton(
+              onPressed: addNovelToServer,
+              child: Text(
+                'สร้างนิยาย',
+                style: TextStyle(fontSize: 18, color: Colors.white),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                padding: EdgeInsets.symmetric(vertical: 14),
+                minimumSize: Size(buttonWidth, buttonHeight),
+                maximumSize: Size(300, 80),
+              ),
             ),
           ),
         ),
@@ -289,7 +368,7 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
       physics: NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 0.75,
+        childAspectRatio: 0.6,
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
       ),
@@ -305,13 +384,32 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
             );
           },
           child: Card(
-            elevation: 6,
+            elevation: 8,
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12)),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            shadowColor: Colors.deepPurple.withOpacity(0.3),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildImage(novels[index]['novel_img']),
+                ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
+                  ),
+                  child: AspectRatio(
+                    aspectRatio: 0.8,
+                    child: Image.network(
+                      novels[index]['novel_img'],
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Icon(Icons.broken_image, size: 50,
+                            color: Colors.grey);
+                      },
+                    ),
+                  ),
+                ),
                 Padding(
                   padding: EdgeInsets.all(8),
                   child: Text(
