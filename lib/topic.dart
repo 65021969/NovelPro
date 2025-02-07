@@ -38,7 +38,7 @@ class _NavigationUIState extends State<NavigationUI> {
                     type: books[index]['type'] ?? "ไม่มีชื่อเรื่อง",
                     penname:books[index]['penname'] ?? "ไม่มีชื่อเรื่อง",
                     description: books[index]['description'] ?? "ไม่มีคำอธิบาย",
-                    imageUrl: books[index]['imageUrl'] ?? "https://via.placeholder.com/150", novelId: null,
+                    imageUrl: books[index]['imageUrl'] ?? "https://via.placeholder.com/150", novelId: 1,
                   ),
                 ),
               );
