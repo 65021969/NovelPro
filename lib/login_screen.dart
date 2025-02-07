@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'main_screen.dart';
 import 'register_screen.dart';
+import 'ForgotPass_Screen.dart'; // ✅ เพิ่ม import หน้า Forgot Password
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -19,7 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (email.isNotEmpty && password.isNotEmpty) {
       try {
-        var url = Uri.parse("http://192.168.1.40:3000/login"); // 🔗 API Login
+        var url = Uri.parse("http://192.168.1.40:3000/login");
         var response = await http.post(
           url,
           headers: {"Content-Type": "application/json"},
@@ -31,13 +32,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
         var responseData = jsonDecode(response.body);
         if (response.statusCode == 200) {
-          // ✅ Login สำเร็จ
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => MainScreen()),
           );
         } else {
-          // ❌ แจ้งเตือนหาก Login ไม่ผ่าน
           _showError(responseData['message']);
         }
       } catch (e) {
@@ -129,11 +128,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('กรุณาติดต่อผู้ดูแลระบบเพื่อรีเซ็ตรหัสผ่าน'),
-                              behavior: SnackBarBehavior.floating,
-                            ),
+                          // ✅ นำไปยังหน้าลืมรหัสผ่าน
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
                           );
                         },
                         child: Text('ลืมรหัสผ่าน?', style: TextStyle(fontSize: 14, color: Color(0xFF9c27b0))),

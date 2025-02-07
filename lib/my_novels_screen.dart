@@ -91,68 +91,131 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
       appBar: AppBar(
         title: Text('นิยายของฉัน', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.deepPurpleAccent,
+        elevation: 0,
       ),
       body: Padding(
         padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextField(
-              controller: _nameController,
-              decoration: InputDecoration(labelText: 'ชื่อนิยาย', errorText: _nameError),
-            ),
-            TextField(
-              controller: _authorController,
-              decoration: InputDecoration(labelText: 'นามปากกา', errorText: _authorError),
-            ),
-            DropdownButtonFormField<String>(
-              value: _selectedGenre,
-              decoration: InputDecoration(labelText: 'เลือกแนวนิยาย'),
-              items: genres.map((genre) => DropdownMenuItem(value: genre, child: Text(genre))).toList(),
-              onChanged: (value) => setState(() => _selectedGenre = value),
-            ),
-            SizedBox(height: 15),
-            Row(
-              children: [
-                Container(
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(border: Border.all(color: Colors.deepPurpleAccent)),
-                  child: _image != null ? Image.file(_image!, fit: BoxFit.cover) : Icon(Icons.image, size: 50),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  labelText: 'ชื่อนิยาย',
+                  labelStyle: TextStyle(color: Colors.deepPurpleAccent),
+                  errorText: _nameError,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
-                SizedBox(width: 16),
-                ElevatedButton.icon(
-                  onPressed: _pickImage,
-                  icon: Icon(Icons.upload_file),
-                  label: Text('อัปโหลดปก'),
+              ),
+              SizedBox(height: 16),
+              TextField(
+                controller: _authorController,
+                decoration: InputDecoration(
+                  labelText: 'นามปากกา',
+                  labelStyle: TextStyle(color: Colors.deepPurpleAccent),
+                  errorText: _authorError,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
-              ],
-            ),
-            ElevatedButton(
-              onPressed: addNovelToServer,
-              child: Text('สร้างนิยาย'),
-            ),
-            Expanded(
-              child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.75),
+              ),
+              SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: _selectedGenre,
+                decoration: InputDecoration(
+                  labelText: 'เลือกแนวนิยาย',
+                  labelStyle: TextStyle(color: Colors.deepPurpleAccent),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+                items: genres.map((genre) => DropdownMenuItem(value: genre, child: Text(genre))).toList(),
+                onChanged: (value) => setState(() => _selectedGenre = value),
+              ),
+              SizedBox(height: 16),
+              Row(
+                children: [
+                  Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.deepPurpleAccent),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: _image != null
+                        ? ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.file(_image!, fit: BoxFit.cover),
+                    )
+                        : Icon(Icons.image, size: 50, color: Colors.deepPurpleAccent),
+                  ),
+                  SizedBox(width: 16),
+                  ElevatedButton.icon(
+                    onPressed: _pickImage,
+                    icon: Icon(Icons.upload_file),
+                    label: Text('อัปโหลดปก'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.deepPurple, // ใช้ backgroundColor แทน primary
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    ),
+                  )
+                ],
+              ),
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: addNovelToServer,
+                child: Text('สร้างนิยาย', style: TextStyle(fontSize: 16)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple, // ใช้ backgroundColor แทน primary
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                ),
+              ),
+              SizedBox(height: 16),
+              GridView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.75,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                ),
                 itemCount: novels.length,
                 itemBuilder: (context, index) {
                   return Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         novels[index]['novel_img'] != null
-                            ? Image.network(novels[index]['novel_img'], height: 150, width: double.infinity, fit: BoxFit.cover)
+                            ? ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.network(novels[index]['novel_img'], height: 150, width: double.infinity, fit: BoxFit.cover),
+                        )
                             : Icon(Icons.broken_image, size: 50),
-                        Padding(padding: EdgeInsets.all(8), child: Text(novels[index]['novel_name'], style: TextStyle(fontWeight: FontWeight.bold))),
-                        Padding(padding: EdgeInsets.symmetric(horizontal: 8), child: Text('โดย: ${novels[index]['novel_penname']}')),
+                        Padding(
+                          padding: EdgeInsets.all(8),
+                          child: Text(
+                            novels[index]['novel_name'],
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 8),
+                          child: Text('โดย: ${novels[index]['novel_penname']}', style: TextStyle(color: Colors.grey)),
+                        ),
                       ],
                     ),
                   );
                 },
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
