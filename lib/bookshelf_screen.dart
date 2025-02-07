@@ -10,23 +10,24 @@ class BookshelfScreen extends StatefulWidget {
 }
 
 class _BookshelfScreenState extends State<BookshelfScreen> {
-  List<Map<String, dynamic>> _favorites = [];
+  List<Map<String, dynamic>> _novels = [];
 
   @override
   void initState() {
     super.initState();
-    fetchFavorites(); // ดึงข้อมูลรายการโปรด
+    fetchNovels();
   }
 
-  // ดึงข้อมูลนิยายที่ถูกเพิ่มเป็นรายการโปรด
-  Future<void> fetchFavorites() async {
+  // ดึงข้อมูลนิยายจาก API
+  Future<void> fetchNovels() async {
     try {
-      final response = await http.get(Uri.parse("http://192.168.1.40:3000/favorites"));
+      final response = await http.get(Uri.parse("http://192.168.1.40:3000/favoritess"));
 
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
         setState(() {
-          _favorites = data.map((novel) => {
+          _novels = data.map((novel) => {
+            'user_id': novel['user_id'],
             'novel_id': novel['novel_id'],
             'title': novel['novel_name'].toString(),
             'type': novel['novel_type_name'],
@@ -38,10 +39,10 @@ class _BookshelfScreenState extends State<BookshelfScreen> {
           }).toList();
         });
       } else {
-        throw Exception("Failed to load favorites");
+        throw Exception("Failed to load novels");
       }
     } catch (e) {
-      print("Error fetching favorites: $e");
+      print("Error fetching novels: $e");
     }
   }
 
@@ -49,10 +50,7 @@ class _BookshelfScreenState extends State<BookshelfScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'รายการโปรด',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
+        title: Text('รายการโปรด', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.deepPurpleAccent,
         flexibleSpace: Container(
           decoration: BoxDecoration(
@@ -64,7 +62,7 @@ class _BookshelfScreenState extends State<BookshelfScreen> {
           ),
         ),
       ),
-      body: _favorites.isEmpty
+      body: _novels.isEmpty
           ? Center(child: CircularProgressIndicator())
           : Padding(
         padding: EdgeInsets.all(8),
@@ -75,7 +73,7 @@ class _BookshelfScreenState extends State<BookshelfScreen> {
             mainAxisSpacing: 8.0,
             childAspectRatio: 0.5,
           ),
-          itemCount: _favorites.length,
+          itemCount: _novels.length,
           itemBuilder: (context, index) {
             return InkWell(
               onTap: () {
@@ -83,12 +81,12 @@ class _BookshelfScreenState extends State<BookshelfScreen> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => NovelDetailPage(
-                      novelId: _favorites[index]['novel_id'],
-                      title: _favorites[index]['title'],
-                      description: _favorites[index]['description'],
-                      type: _favorites[index]['type'],
-                      penname: _favorites[index]['penname'],
-                      imageUrl: _favorites[index]['image'],
+                      novelId: _novels[index]['novel_id'],
+                      title: _novels[index]['title'],
+                      description: _novels[index]['description'],
+                      type: _novels[index]['type'],
+                      penname:_novels[index]['penname'],
+                      imageUrl: _novels[index]['image'],
                     ),
                   ),
                 );
@@ -109,7 +107,7 @@ class _BookshelfScreenState extends State<BookshelfScreen> {
                         topRight: Radius.circular(8),
                       ),
                       child: CachedNetworkImage(
-                        imageUrl: _favorites[index]['image'],
+                        imageUrl: _novels[index]['image'],
                         height: MediaQuery.of(context).size.height * 0.19,
                         width: double.infinity,
                         fit: BoxFit.cover,
@@ -123,20 +121,20 @@ class _BookshelfScreenState extends State<BookshelfScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            _favorites[index]['title'],
+                            _novels[index]['title'],
                             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          SizedBox(height: 4),
+                          SizedBox(height: 4), // เพิ่มระยะห่าง
                           Text(
-                            _favorites[index]['type'],
+                            _novels[index]['type'],  // แสดงประเภทของนิยาย
                             style: TextStyle(fontSize: 14, color: Colors.grey[700]),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(
-                            _favorites[index]['penname'],
+                            _novels[index]['penname'],  // แสดงประเภทของนิยาย
                             style: TextStyle(fontSize: 14, color: Colors.grey[700]),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
