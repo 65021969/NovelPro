@@ -25,7 +25,7 @@ class NovelDetailPage extends StatefulWidget {
 
 class _NovelDetailPageState extends State<NovelDetailPage> {
   bool isFavorite = false;
-  final String apiUrl = "http://192.168.1.40:3000"; // ✅ URL ของเซิร์ฟเวอร์
+  final String apiUrl = "http://192.168.105.101:3000"; // ✅ URL ของเซิร์ฟเวอร์
 
   @override
   void initState() {
@@ -106,49 +106,81 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
-        backgroundColor: Colors.deepPurpleAccent,
-        centerTitle: true,
+        title: Text(
+          widget.title,
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.deepPurple,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF5e35b1), Color(0xFF9c27b0)],
+            ),
+          ),
+        ),
+        elevation: 6,
+        centerTitle: false,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.network(
-                widget.imageUrl,
-                height: 200,
-                width: double.infinity,
-                fit: BoxFit.cover,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: widget.imageUrl.isNotEmpty
+                    ? Image.network(
+                  widget.imageUrl,
+                  height: 500,
+                  width: double.infinity,
+                  fit: BoxFit.contain, // ใช้ BoxFit.contain แทน BoxFit.cover
+                  errorBuilder: (context, error, stackTrace) =>
+                      Icon(Icons.broken_image, size: 100, color: Colors.grey),
+                )
+                    : Icon(
+                    Icons.image_not_supported, size: 100, color: Colors.grey),
               ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              widget.title,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            Text(
-              "แนว: ${widget.type}",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
-            SizedBox(height: 5),
-            Text(
-              "โดย ${widget.penname}",
-              style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic, color: Colors.grey[700]),
-            ),
-            SizedBox(height: 10),
-            Text(
-              widget.description,
-              style: TextStyle(fontSize: 16),
-            ),
-          ],
+              SizedBox(height: 20),
+              Text(
+                widget.title,
+                style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
+              Row(
+                children: [
+                  Icon(Icons.category, color: Colors.purple),
+                  SizedBox(width: 5),
+                  Text(
+                    "แนว : ${widget.type}",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+              SizedBox(height: 5),
+              Row(
+                children: [
+                  Icon(Icons.person, color: Colors.grey[700]),
+                  SizedBox(width: 5),
+                  Text(
+                    "ผู้เขียน : ${widget.penname}",
+                    style: TextStyle(fontSize: 18,fontWeight: FontWeight.w600,
+                        fontStyle: FontStyle.normal,
+                        color: Colors.grey[700]),
+                  ),
+                ],
+              ),
+              SizedBox(height: 10),
+              Text(
+                widget.description,
+                style: TextStyle(fontSize: 18),
+              ),
+            ],
+          ),
         ),
       ),
-
-      // ✅ ปุ่มเพิ่ม/ลบนิยายโปรด
       floatingActionButton: FloatingActionButton(
         onPressed: toggleFavorite,
         backgroundColor: isFavorite ? Colors.red : Colors.purple,
