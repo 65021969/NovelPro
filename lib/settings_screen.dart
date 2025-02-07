@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'logout_screen.dart';
+import 'profile.dart';
 
 class SettingsScreen extends StatelessWidget {
   @override
@@ -27,7 +28,12 @@ class SettingsScreen extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.person, color: Colors.blue),
             title: Text('บัญชีของฉัน'),
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfilePage()),
+              );
+            },
           ),
           ListTile(
             leading: Icon(Icons.notifications, color: Colors.green),
