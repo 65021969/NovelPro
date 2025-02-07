@@ -29,7 +29,14 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
     'สยองขวัญ': 6,
   };
 
-  final List<String> genres = ['แฟนตาซี', 'โรแมนติก', 'สืบสวน', 'วิทยาศาสตร์', 'ผจญภัย', 'สยองขวัญ'];
+  final List<String> genres = [
+    'แฟนตาซี',
+    'โรแมนติก',
+    'สืบสวน',
+    'วิทยาศาสตร์',
+    'ผจญภัย',
+    'สยองขวัญ'
+  ];
 
   @override
   void initState() {
@@ -39,16 +46,20 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
 
   Future<void> fetchNovels() async {
     try {
-      final response = await http.get(Uri.parse("http://192.168.1.40:3000/novel"));
+      final response = await http.get(
+          Uri.parse("http://192.168.1.40:3000/novel"));
 
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
         setState(() {
-          novels = data.map((novel) => {
+          novels = data.map((novel) =>
+          {
             'novel_name': novel['novel_name'].toString(),
             'novel_penname': novel['novel_penname'].toString(),
-            'novel_img': novel['novel_img'] != null && novel['novel_img'].toString().isNotEmpty
-                ? "http://192.168.1.40:3000/uploads/${novel['novel_img']}"
+            'novel_img': novel['novel_img'] != null && novel['novel_img']
+                .toString()
+                .isNotEmpty
+                ? "http://192.168.105.101:3000/uploads/${novel['novel_img']}"
                 : 'https://via.placeholder.com/150', // รูปสำรอง
             'novel_type_name': novel['novel_type_name'] ?? "ไม่ระบุ",
           }).toList();
@@ -63,22 +74,25 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
 
   Future<void> addNovelToServer() async {
     // Validate form fields
-    if (_nameController.text.isEmpty || _authorController.text.isEmpty || _selectedGenre == null || _image == null) {
+    if (_nameController.text.isEmpty || _authorController.text.isEmpty ||
+        _selectedGenre == null || _image == null) {
       setState(() {
         _nameError = _nameController.text.isEmpty ? 'กรุณากรอกชื่อนิยาย' : null;
-        _authorError = _authorController.text.isEmpty ? 'กรุณากรอกนามปากกา' : null;
+        _authorError =
+        _authorController.text.isEmpty ? 'กรุณากรอกนามปากกา' : null;
       });
       return;
     }
 
     final request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://192.168.1.40:3000/novel'),
+      Uri.parse('http://192.168.105.101:3000/novel'),
     );
 
     request.fields['novel_name'] = _nameController.text;
     request.fields['novel_penname'] = _authorController.text;
-    request.fields['novel_type_id'] = (genreMap[_selectedGenre ?? ''] ?? 0).toString();
+    request.fields['novel_type_id'] =
+        (genreMap[_selectedGenre ?? ''] ?? 0).toString();
 
     request.files.add(
       await http.MultipartFile.fromPath('novel_img', _image!.path),
@@ -100,7 +114,8 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
   }
 
   Future<void> _pickImage() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile = await ImagePicker().pickImage(
+        source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
@@ -121,13 +136,16 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
     }
   }
 
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('นิยายของฉัน', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.deepPurpleAccent,
-        elevation: 0,
+        title: Text(
+          'นิยายของฉัน',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.deepPurple,
+        elevation: 6,
+        centerTitle: true,
       ),
       body: Padding(
         padding: EdgeInsets.all(16),
@@ -135,134 +153,177 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  labelText: 'ชื่อนิยาย',
-                  labelStyle: TextStyle(color: Colors.deepPurpleAccent),
-                  errorText: _nameError,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                ),
-              ),
+              _buildTextField('ชื่อนิยาย', _nameController, _nameError),
               SizedBox(height: 16),
-              TextField(
-                controller: _authorController,
-                decoration: InputDecoration(
-                  labelText: 'นามปากกา',
-                  labelStyle: TextStyle(color: Colors.deepPurpleAccent),
-                  errorText: _authorError,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                ),
-              ),
+              _buildTextField('นามปากกา', _authorController, _authorError),
               SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                value: _selectedGenre,
-                decoration: InputDecoration(
-                  labelText: 'เลือกแนวนิยาย',
-                  labelStyle: TextStyle(color: Colors.deepPurpleAccent),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                ),
-                items: genres.map((genre) => DropdownMenuItem(value: genre, child: Text(genre))).toList(),
-                onChanged: (value) => setState(() => _selectedGenre = value),
-              ),
+              _buildDropdown(),
               SizedBox(height: 16),
-              Row(
-                children: [
-                  Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.deepPurpleAccent),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: _image != null
-                        ? ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.file(_image!, fit: BoxFit.cover),
-                    )
-                        : Icon(Icons.image, size: 50, color: Colors.deepPurpleAccent),
-                  ),
-                  SizedBox(width: 16),
-                  ElevatedButton.icon(
-                    onPressed: _pickImage,
-                    icon: Icon(Icons.upload_file),
-                    label: Text('อัปโหลดปก'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple, // ใช้ backgroundColor แทน primary
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                    ),
-                  )
-                ],
-              ),
-              SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: addNovelToServer,
-                child: Text('สร้างนิยาย', style: TextStyle(fontSize: 16)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple, // ใช้ backgroundColor แทน primary
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                ),
-              ),
-              SizedBox(height: 16),
-              GridView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 0.75,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                ),
-                itemCount: novels.length,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () {
-                      // Navigate to the NovelDetailPage and pass the novel data
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => NovelDetailPage(novel: novels[index]),
-                        ),
-                      );
-                    },
-                    child: Card(
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildImage(novels[index]['novel_img']),
-                          Padding(
-                            padding: EdgeInsets.all(8),
-                            child: Text(
-                              novels[index]['novel_name'],
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 8),
-                            child: Text(
-                              'โดย: ${novels[index]['novel_penname']}',
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
+              _buildImagePicker(),
+              SizedBox(height: 24),
+              _buildActionButtons(),
+              SizedBox(height: 24),
+              _buildNovelGrid(),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField(String label, TextEditingController controller,
+      String? errorText) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: Colors.deepPurple),
+        errorText: errorText,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(color: Colors.deepPurple),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(color: Colors.deepPurpleAccent, width: 2),
+        ),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      ),
+    );
+  }
+
+  Widget _buildDropdown() {
+    return DropdownButtonFormField<String>(
+      value: _selectedGenre,
+      decoration: InputDecoration(
+        labelText: 'เลือกแนวนิยาย',
+        labelStyle: TextStyle(color: Colors.deepPurple),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(color: Colors.deepPurple),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(color: Colors.deepPurpleAccent, width: 2),
+        ),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      ),
+      items: genres.map((genre) =>
+          DropdownMenuItem(value: genre, child: Text(genre))).toList(),
+      onChanged: (value) => setState(() => _selectedGenre = value),
+    );
+  }
+
+  Widget _buildImagePicker() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start, // จัดให้เริ่มจากซ้าย
+      crossAxisAlignment: CrossAxisAlignment.center, // จัดให้อยู่ระดับกลางแนวตั้ง
+      children: [
+        Container(
+          width: 120,
+          height: 120,
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.deepPurple, width: 2),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: _image != null
+              ? ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.file(_image!, fit: BoxFit.cover),
+          )
+              : Icon(Icons.image, size: 60, color: Colors.deepPurple),
+        ),
+        SizedBox(width: 16), // เพิ่มช่องว่างระหว่างภาพและปุ่ม
+        ElevatedButton.icon(
+          onPressed: _pickImage,
+          icon: Icon(Icons.upload_file, color: Colors.white),
+          label: Text('อัปโหลดปก', style: TextStyle(color: Colors.white)),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.deepPurple,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: EdgeInsets.symmetric(vertical: 14, horizontal: 24),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionButtons() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center, // จัดให้อยู่กลาง
+      children: [
+        Flexible(
+          child: ElevatedButton(
+            onPressed: addNovelToServer,
+            child: Text(
+              'สร้างนิยาย',
+              style: TextStyle(fontSize: 16, color: Colors.white),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              padding: EdgeInsets.symmetric(vertical: 14),
+              minimumSize: Size(200, 50), // กำหนดขนาดขั้นต่ำ
+              maximumSize: Size(300, 60), // กำหนดขนาดสูงสุด
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNovelGrid() {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 0.75,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+      ),
+      itemCount: novels.length,
+      itemBuilder: (context, index) {
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => NovelDetailPage(novel: novels[index]),
+              ),
+            );
+          },
+          child: Card(
+            elevation: 6,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildImage(novels[index]['novel_img']),
+                Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Text(
+                    novels[index]['novel_name'],
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8),
+                  child: Text(
+                    'โดย: ${novels[index]['novel_penname']}',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
