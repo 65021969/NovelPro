@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'novel_detail_page.dart';
 
 class MyNovelsScreen extends StatefulWidget {
   @override
@@ -37,17 +38,36 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
   }
 
   Future<void> fetchNovels() async {
-    final response = await http.get(Uri.parse('http://192.168.1.40:3000/novel'));
-    if (response.statusCode == 200) {
-      setState(() {
-        novels = List<Map<String, dynamic>>.from(json.decode(response.body));
-      });
+    try {
+      final response = await http.get(Uri.parse("http://192.168.1.40:3000/novel"));
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+        setState(() {
+          novels = data.map((novel) => {
+            'novel_name': novel['novel_name'].toString(),
+            'novel_penname': novel['novel_penname'].toString(),
+            'novel_img': novel['novel_img'] != null && novel['novel_img'].toString().isNotEmpty
+                ? "http://192.168.1.40:3000/uploads/${novel['novel_img']}"
+                : 'https://via.placeholder.com/150', // รูปสำรอง
+            'novel_type_name': novel['novel_type_name'] ?? "ไม่ระบุ",
+          }).toList();
+        });
+      } else {
+        throw Exception("Failed to load novels");
+      }
+    } catch (e) {
+      print("Error fetching novels: $e");
     }
   }
 
   Future<void> addNovelToServer() async {
-    if (_image == null) {
-      print("กรุณาเลือกรูปภาพก่อน");
+    // Validate form fields
+    if (_nameController.text.isEmpty || _authorController.text.isEmpty || _selectedGenre == null || _image == null) {
+      setState(() {
+        _nameError = _nameController.text.isEmpty ? 'กรุณากรอกชื่อนิยาย' : null;
+        _authorError = _authorController.text.isEmpty ? 'กรุณากรอกนามปากกา' : null;
+      });
       return;
     }
 
@@ -72,6 +92,9 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
       _selectedGenre = null;
       setState(() => _image = null);
     } else {
+      setState(() {
+        _nameError = 'เกิดข้อผิดพลาด: ${response.reasonPhrase}';
+      });
       print("เกิดข้อผิดพลาด: ${response.reasonPhrase}");
     }
   }
@@ -82,6 +105,19 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
       setState(() {
         _image = File(pickedFile.path);
       });
+    }
+  }
+
+  Widget _buildImage(String? imageUrl) {
+    if (imageUrl == null) {
+      return Icon(Icons.broken_image, size: 50);
+    } else {
+      return Image.network(
+        imageUrl,
+        height: 150,
+        width: double.infinity,
+        fit: BoxFit.cover,
+      );
     }
   }
 
@@ -184,32 +220,41 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
                 ),
                 itemCount: novels.length,
                 itemBuilder: (context, index) {
-                  return Card(
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        novels[index]['novel_img'] != null
-                            ? ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.network(novels[index]['novel_img'], height: 150, width: double.infinity, fit: BoxFit.cover),
-                        )
-                            : Icon(Icons.broken_image, size: 50),
-                        Padding(
-                          padding: EdgeInsets.all(8),
-                          child: Text(
-                            novels[index]['novel_name'],
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                  return GestureDetector(
+                    onTap: () {
+                      // Navigate to the NovelDetailPage and pass the novel data
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => NovelDetailPage(novel: novels[index]),
+                        ),
+                      );
+                    },
+                    child: Card(
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildImage(novels[index]['novel_img']),
+                          Padding(
+                            padding: EdgeInsets.all(8),
+                            child: Text(
+                              novels[index]['novel_name'],
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 8),
-                          child: Text('โดย: ${novels[index]['novel_penname']}', style: TextStyle(color: Colors.grey)),
-                        ),
-                      ],
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8),
+                            child: Text(
+                              'โดย: ${novels[index]['novel_penname']}',
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 },
