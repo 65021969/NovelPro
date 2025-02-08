@@ -35,8 +35,19 @@ class MyChapterDetailPage extends StatelessWidget {
     if (quillDocument == null) {
       return Scaffold(
         appBar: AppBar(
-          title: Text("📖 เล่มที่ ${novelVolumes['chap_num'] ?? 'ไม่มีข้อมูล'}"),
+          title: Text("เล่มที่ ${novelVolumes['chap_num'] ?? 'ไม่มีข้อมูล'} ", style: TextStyle(color: Colors.white),),
           backgroundColor: Colors.deepPurple,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF5e35b1), Color(0xFF9c27b0)],
+              ),
+            ),
+          ),
+          elevation: 6,
+          centerTitle: false,
         ),
         body: Center(child: Text("ไม่มีเนื้อหา")),
       );
@@ -47,11 +58,21 @@ class MyChapterDetailPage extends StatelessWidget {
       document: quillDocument,
       selection: TextSelection.collapsed(offset: 0),
     );
-
     return Scaffold(
       appBar: AppBar(
-        title: Text("📖 เล่มที่ ${novelVolumes['chap_num'] ?? 'ไม่มีข้อมูล'}"),
+        title: Text("เล่มที่ ${novelVolumes['chap_num'] ?? 'ไม่มีข้อมูล'}"),
         backgroundColor: Colors.deepPurple,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF5e35b1), Color(0xFF9c27b0)],
+            ),
+          ),
+        ),
+        elevation: 6,
+        centerTitle: false,
       ),
       body: Padding(
         padding: EdgeInsets.all(16),

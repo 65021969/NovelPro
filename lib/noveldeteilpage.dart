@@ -26,7 +26,7 @@ class NovelDetailPage extends StatefulWidget {
 
 class _NovelDetailPageState extends State<NovelDetailPage> {
   bool isFavorite = false;
-  final String apiUrl = "http://192.168.1.40:3000"; // URL ของเซิร์ฟเวอร์
+  final String apiUrl = "http://192.168.105.101:3000"; // URL ของเซิร์ฟเวอร์
   List<Map<String, dynamic>> volumes = []; // รายการเล่มของนิยาย
   List<Map<String, dynamic>> comments = []; // รายการคอมเม้นต์
   final TextEditingController commentController = TextEditingController();
@@ -42,7 +42,6 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
   Future<void> checkFavoriteStatus() async {
     try {
       final response = await http.get(Uri.parse("$apiUrl/favorites/${widget.novelId}"));
-
       if (response.statusCode == 200) {
         final result = json.decode(response.body);
         setState(() {
@@ -135,7 +134,6 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -145,6 +143,14 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
             gradient: LinearGradient(colors: [Color(0xFF5e35b1), Color(0xFF9c27b0)]),
           ),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.more_vert),
+            onPressed: () {
+              // Handle additional options
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -153,38 +159,50 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(12),
                 child: Image.network(
                   widget.imageUrl,
                   height: 500,
                   width: double.infinity,
-                  fit: BoxFit.contain,
+                  fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) =>
                       Icon(Icons.broken_image, size: 100, color: Colors.grey),
                 ),
               ),
               SizedBox(height: 20),
-              Text(widget.title, style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
+              Text("ชื่อนิยาย: ${widget.title}", style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.deepPurple)),
               SizedBox(height: 10),
               Row(
                 children: [
-                  Icon(Icons.category, color: Colors.purple),
+                  Icon(Icons.category, color: Colors.deepPurpleAccent),
                   SizedBox(width: 5),
-                  Text("แนว : ${widget.type}", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                  Text(
+                    "แนว : ",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), // ตัวหนา
+                  ),
+                  Text(
+                    "${widget.type}",
+                    style: TextStyle(fontSize: 18), // ไม่ต้องทำตัวหนา
+                  ),
                 ],
               ),
               SizedBox(height: 5),
               Row(
                 children: [
-                  Icon(Icons.person, color: Colors.grey[700]),
+                  Icon(Icons.person, color: Colors.deepPurpleAccent),
                   SizedBox(width: 5),
-                  Text("ผู้เขียน : ${widget.penname}", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.grey[700])),
+                  Text(
+                    "ผู้เขียน : ",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), // ตัวหนา
+                  ),
+                  Text(
+                    "${widget.penname}",
+                    style: TextStyle(fontSize: 18, ), // ไม่ต้องทำตัวหนา
+                  ),
                 ],
               ),
-              SizedBox(height: 10),
-              Text(widget.description, style: TextStyle(fontSize: 18)),
-              SizedBox(height: 20),
-              Text("รายการเล่ม", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+              SizedBox(height: 15),
+              Text("รายการเล่ม", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.deepPurple)),
               SizedBox(height: 10),
               volumes.isEmpty
                   ? Center(child: Text("ไม่มีข้อมูลเล่ม", style: TextStyle(fontSize: 18, color: Colors.grey)))
@@ -195,17 +213,16 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
                 itemBuilder: (context, index) {
                   final volume = volumes[index];
                   return Card(
-                    elevation: 3,
+                    elevation: 5,
                     margin: EdgeInsets.symmetric(vertical: 5),
                     child: ListTile(
+                      leading: Icon(Icons.menu_book, color: Colors.deepPurpleAccent),
                       title: Text("เล่มที่ ${volume['chap_num']}", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => AllChapterDetailPage(
-                              novelVolumes: volumes[index], // ส่งข้อมูลทั้งหมดไป
-                            ),
+                            builder: (context) => AllChapterDetailPage(novelVolumes: volumes[index]),
                           ),
                         );
                       },
@@ -214,7 +231,7 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
                 },
               ),
               SizedBox(height: 20),
-              Text("ความคิดเห็น", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+              Text("ความคิดเห็น", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.deepPurple)),
               SizedBox(height: 10),
               comments.isEmpty
                   ? Center(child: Text("ยังไม่มีความคิดเห็น", style: TextStyle(fontSize: 18, color: Colors.grey)))
@@ -225,11 +242,11 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
                 itemBuilder: (context, index) {
                   final comment = comments[index];
                   return Card(
-                    elevation: 3,
+                    elevation: 5,
                     margin: EdgeInsets.symmetric(vertical: 5),
                     child: ListTile(
-                      title: Text(comments[0]['user_name'], style: TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Text(comments[0]['com_text'].toString()),
+                      title: Text(comment['user_name'], style: TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text(comment['com_text'].toString()),
                     ),
                   );
                 },
@@ -240,6 +257,7 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
                 decoration: InputDecoration(
                   hintText: "พิมพ์ความคิดเห็นของคุณ...",
                   border: OutlineInputBorder(),
+                  focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.purple)),
                 ),
                 maxLines: 3,
               ),
@@ -248,8 +266,10 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
                 onPressed: postComment,
                 child: Text("โพสต์ความคิดเห็น"),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.purple,
+                  backgroundColor: Colors.deepPurple,
                   foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  padding: EdgeInsets.symmetric(vertical: 12),
                 ),
               ),
             ],
@@ -258,7 +278,7 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: toggleFavorite,
-        backgroundColor: isFavorite ? Colors.red : Colors.purple,
+        backgroundColor: isFavorite ? Colors.red : Colors.deepPurple,
         child: Icon(isFavorite ? Icons.favorite : Icons.favorite_border, color: Colors.white),
       ),
     );
