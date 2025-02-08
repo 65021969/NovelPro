@@ -1,16 +1,13 @@
-# ssssswwww
+คู่มือการตั้งค่าแอป Write and Read Novels
 
-A new Flutter project.
+นายณัฐวุฒิ วัฒนมาลา	65021600
+นายนฤพนธ์ วงค์ชัย	  65021824
+นายพีรพัฒน์ วงค์ชัย   65021969
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+ขั้นตอนการตั้งค่าโปรเจกต์:
+1.ดาวน์โหลดไฟล์ SQL: appnovel.sql เพื่อใช้ในการตั้งค่าฐานข้อมูล
+2.ก่อนที่จะใช้งานแอปพลิเคชันในรูปแบบ localhost จำเป็นต้องอัปเดตที่อยู่ IP ในไฟล์ให้เป็นที่อยู่ IP 
+ของเครื่องผู้ใช้งาน เพื่อให้แอปพลิเคชันสามารถเชื่อมต่อกับเซิร์ฟเวอร์ภายในเครื่องได้อย่างถูกต้อง
+3.เปิดเทอร์มินัลและรันไฟล์ server.js เพื่อสร้างการเชื่อมต่อระหว่างแอปพลิเคชันและฐานข้อมูล
+4.เปิด Android Studio และโหลดโปรเจกต์ของแอปพลิเคชัน จากนั้นเลือกอุปกรณ์ทดสอบ (โทรศัพท์หรือ Emulator) 
+แล้วคลิก "Run" เพื่อเริ่มต้นการทำงานของแอปพลิเคชัน
