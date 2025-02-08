@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'allchapterdetailpage.dart';
 
 class NovelDetailPage extends StatefulWidget {
   final int novelId;
@@ -32,14 +33,12 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
   void initState() {
     super.initState();
     checkFavoriteStatus();
-    fetchVolumes(); // ดึงข้อมูลเล่มของนิยาย
+    fetchVolumes();
   }
 
   Future<void> checkFavoriteStatus() async {
     try {
-      final response = await http.get(
-        Uri.parse("$apiUrl/favorites/${widget.novelId}"),
-      );
+      final response = await http.get(Uri.parse("$apiUrl/favorites/${widget.novelId}"));
 
       if (response.statusCode == 200) {
         final result = json.decode(response.body);
@@ -55,9 +54,7 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
   Future<void> toggleFavorite() async {
     try {
       if (isFavorite) {
-        final response = await http.delete(
-          Uri.parse("$apiUrl/favorites/${widget.novelId}"),
-        );
+        final response = await http.delete(Uri.parse("$apiUrl/favorites/${widget.novelId}"));
         if (response.statusCode == 200) {
           setState(() {
             isFavorite = false;
@@ -96,17 +93,13 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    print('novel_id');
-    print(widget.novelId);
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.deepPurple,
         flexibleSpace: Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF5e35b1), Color(0xFF9c27b0)],
-            ),
+            gradient: LinearGradient(colors: [Color(0xFF5e35b1), Color(0xFF9c27b0)]),
           ),
         ),
       ),
@@ -163,9 +156,21 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
                     margin: EdgeInsets.symmetric(vertical: 5),
                     child: ListTile(
                       title: Text("เล่มที่ ${volume['chap_num']}", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                      // subtitle: Text(volume['volume_description']),
                       onTap: () {
-                        // TODO: เพิ่มหน้าแสดงรายละเอียดของเล่ม
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AllChapterDetailPage(
+                              novelId: widget.novelId,
+                              novelTitle: widget.title,
+                              novelDescription: widget.description,
+                              novelImageUrl: widget.imageUrl,
+                              novelType: widget.type,
+                              novelPenname: widget.penname,
+                              novelVolumes: volumes, // ส่งข้อมูลทั้งหมดไป
+                            ),
+                          ),
+                        );
                       },
                     ),
                   );

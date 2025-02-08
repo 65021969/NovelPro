@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
 
 class AddnovelPage extends StatefulWidget {
-  final Map<String, dynamic> novel; // เพิ่มเพื่อรับข้อมูลจากหน้า NovelDetailPage
+  final Map<String, dynamic> novel;
 
   AddnovelPage({required this.novel});
 
@@ -13,43 +14,41 @@ class AddnovelPage extends StatefulWidget {
 
 class _AddnovelPageState extends State<AddnovelPage> {
   TextEditingController _bookNumberController = TextEditingController();
-  TextEditingController _descriptionController = TextEditingController();
+  quill.QuillController _quillController = quill.QuillController.basic();
 
   Future<void> _submitNovel() async {
     try {
+      final jsonDescription = json.encode(_quillController.document.toDelta().toJson());
+
       final response = await http.post(
-        Uri.parse('http://192.168.1.40:3000/addnovel'), // URL ของ API ที่จะรับข้อมูล
+        Uri.parse('http://192.168.1.40:3000/addnovel'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
-          'novel_id':widget.novel['novel_id'],// ใช้ข้อมูลจาก novel ที่ส่งมาจาก NovelDetailPage
-          'chap_write': _descriptionController.text,
-          'novel_num': int.tryParse(_bookNumberController.text) ?? 0, // หมายเลขเล่มที่กรอก
+          'novel_id': widget.novel['novel_id'],
+          'chap_write': jsonDescription,
+          'novel_num': int.tryParse(_bookNumberController.text) ?? 0,
         }),
       );
 
       if (response.statusCode == 200) {
-        // ถ้าบันทึกสำเร็จ
         Navigator.pop(context, 'บันทึกเล่ม ${_bookNumberController.text} สำเร็จ');
       } else {
         throw Exception('ไม่สามารถบันทึกข้อมูลได้');
       }
     } catch (e) {
       print("Error: $e");
-      // จัดการกับข้อผิดพลาด
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('เกิดข้อผิดพลาดในการบันทึกข้อมูล'),
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('เกิดข้อผิดพลาดในการบันทึกข้อมูล')),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    print('novel_id');
-    print(widget.novel['novel_id']);
     return Scaffold(
       appBar: AppBar(
         title: Text("เพิ่มเล่มใหม่"),
-        backgroundColor: Colors.grey[300],
+        backgroundColor: Colors.deepPurple,
         centerTitle: true,
       ),
       body: Padding(
@@ -71,20 +70,37 @@ class _AddnovelPageState extends State<AddnovelPage> {
               keyboardType: TextInputType.number,
             ),
             SizedBox(height: 10),
-            TextField(
-              controller: _descriptionController,
-              decoration: InputDecoration(
-                hintText: "กรอกคำอธิบาย",
-                border: OutlineInputBorder(),
+
+            // ✅ แก้ปัญหา QuillToolbar
+            quill.QuillToolbar.simple(controller: _quillController),
+            SizedBox(height: 10),
+
+            // ✅ แก้ไข QuillEditor ให้ใช้งานได้บน Android
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.shade400),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: quill.QuillEditor(
+                  controller: _quillController,
+                  // readOnly: false,
+                  scrollController: ScrollController(),
+                  focusNode: FocusNode(),
+                  // autoFocus: true,
+                  // expands: true,
+                  // padding: EdgeInsets.zero,
+                ),
               ),
-              maxLines: 5,
             ),
-            Spacer(),
+            SizedBox(height: 10),
+
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 ElevatedButton(
-                  onPressed: _submitNovel, // เรียกใช้ฟังก์ชันเพื่อส่งข้อมูล
+                  onPressed: _submitNovel,
                   child: Text("บันทึก"),
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
                 ),

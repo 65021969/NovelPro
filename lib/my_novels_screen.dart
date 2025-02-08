@@ -62,7 +62,7 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
                 .isNotEmpty
                 ? "http://192.168.1.40:3000/uploads/${novel['novel_img']}"
                 : 'https://via.placeholder.com/150', // รูปสำรอง
-            'novel_type_name': novel['novel_type_name'] ?? "ไม่ระบุ",
+            'novel_type_name': novel['novel_type_name'],
           }).toList();
         });
       } else {
@@ -139,7 +139,7 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
 
   Widget build(BuildContext context) {
     print('novel_id1');
-    // print(novels);
+    print(novels);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -383,6 +383,7 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
       itemBuilder: (context, index) {
         return GestureDetector(
           onTap: () {
+            print("Sending Novel Data: ${novels[index]}");
             Navigator.push(
               context,
               MaterialPageRoute(

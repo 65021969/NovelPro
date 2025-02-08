@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'addnovelpage.dart'; // Import หน้าสำหรับเพิ่มเล่มใหม่
+import 'addnovelpage.dart';
+import 'mychapterdetailpage.dart'; // Import หน้าสำหรับเพิ่มเล่มใหม่
 
 class NovelDetailPage extends StatefulWidget {
   final Map<String, dynamic> novel;
@@ -39,6 +40,7 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    print(widget.novel);
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.novel['novel_name'] ?? 'ไม่พบข้อมูล', style: TextStyle(color: Colors.white)),
@@ -84,7 +86,7 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
             ),
             SizedBox(height: 16),
             Text(
-              'แนวนิยาย: ${widget.novel['novel_type_name'] ?? 'ไม่ระบุ'}',
+              'แนวนิยาย: ${widget.novel['novel_type_name'] }',
               style: TextStyle(fontSize: 16),
             ),
             SizedBox(height: 16),
@@ -102,7 +104,18 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
                     child: ListTile(
                       title: Text("เล่มที่: ${_novelVolumes[index]['chap_num']}"),
                       subtitle: Text(_novelVolumes[index]['chap_write']),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MyChapterDetailPage(
+                              novelVolumes: _novelVolumes[index], // ส่งข้อมูลเล่มที่เลือกไป
+                            ),
+                          ),
+                        );
+                      },
                     ),
+
                   );
                 },
               ),
