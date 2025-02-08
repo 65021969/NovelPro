@@ -26,7 +26,7 @@ class NovelDetailPage extends StatefulWidget {
 
 class _NovelDetailPageState extends State<NovelDetailPage> {
   bool isFavorite = false;
-  final String apiUrl = "http://192.168.105.101:3000"; // URL ของเซิร์ฟเวอร์
+  final String apiUrl = "http://192.168.1.40:3000"; // URL ของเซิร์ฟเวอร์
   List<Map<String, dynamic>> volumes = []; // รายการเล่มของนิยาย
 
   @override
@@ -161,13 +161,13 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => AllChapterDetailPage(
-                              novelId: widget.novelId,
-                              novelTitle: widget.title,
-                              novelDescription: widget.description,
-                              novelImageUrl: widget.imageUrl,
-                              novelType: widget.type,
-                              novelPenname: widget.penname,
-                              novelVolumes: volumes, // ส่งข้อมูลทั้งหมดไป
+                              // novelId: widget.novelId,
+                              // novelTitle: widget.title,
+                              // novelDescription: widget.description,
+                              // novelImageUrl: widget.imageUrl,
+                              // novelType: widget.type,
+                              // novelPenname: widget.penname,
+                              novelVolumes: volumes[index], // ส่งข้อมูลทั้งหมดไป
                             ),
                           ),
                         );

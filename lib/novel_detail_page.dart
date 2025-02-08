@@ -24,7 +24,7 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
 
   Future<void> _fetchNovelVolumes() async {
     try {
-      final response = await http.get(Uri.parse('http://192.168.105.101:3000/novels/${widget.novel['novel_id']}'));
+      final response = await http.get(Uri.parse('http://192.168.1.40:3000/novels/${widget.novel['novel_id']}'));
 
       if (response.statusCode == 200) {
         setState(() {
@@ -103,7 +103,6 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
                   return Card(
                     child: ListTile(
                       title: Text("เล่มที่: ${_novelVolumes[index]['chap_num']}"),
-                      subtitle: Text(_novelVolumes[index]['chap_write']),
                       onTap: () {
                         Navigator.push(
                           context,

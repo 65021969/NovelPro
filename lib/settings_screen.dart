@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'login_screen.dart';
-
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 
 class SettingsScreen extends StatefulWidget {
@@ -11,10 +12,63 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  String name = "Pheeraphat Wongchai";
-  String username = "pheeraphat_w";
-  String email = "peerapat3250@gmail.com";
-  String password = "**********"; // แสดงรหัสผ่านเป็น ********** เริ่มต้น
+
+  String name = "";
+  String username = "";
+  String email = "";
+  String password = "********"; // แสดงรหัสผ่านเป็น ********** เริ่มต้น
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserInfo();
+  }
+
+  Future<void> fetchUserInfo() async {
+    final url = Uri.parse("http://192.168.1.40:3000/user");
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          name = data["user_name"] ?? "";
+          username = data["user_name"] ?? "";
+          email = data["user_email"] ?? "";
+        });
+        print("Name: $name, Username: $username, Email: $email");
+      } else {
+        print("Error fetching user info: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("⚠️ Failed to fetch user info: $e");
+    }
+  }
+
+  Future<void> updateUserName(String newName) async {
+    final url = Uri.parse("http://192.168.1.40:3000/updateName");
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({
+          "username": username,
+          "name": newName}),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          name = newName;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("อัปเดตชื่อเรียบร้อยแล้ว")),
+        );
+      } else {
+        print("Failed to update name: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error updating name: $e");
+    }
+  }
 
   void copyToClipboard(BuildContext context, String text) {
     Clipboard.setData(ClipboardData(text: text));
@@ -102,6 +156,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  Future<void> changePassword(String newPassword) async {
+    final url = Uri.parse("http://192.168.1.40:3000/change-password"); // เปลี่ยนเป็น URL ของ API ของคุณ
+    final response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "user_pass": newPassword,  // ส่งข้อมูลรหัสผ่านใหม่
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print("Success: ${response.body}");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("รหัสผ่านถูกเปลี่ยนแล้ว")),
+      );
+    } else {
+      print("Failed: ${response.statusCode} - ${response.body}");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("เกิดข้อผิดพลาดในการเปลี่ยนรหัสผ่าน")),
+      );
+    }
+  }
+
 
   void showChangePasswordDialog() {
     TextEditingController newPasswordController = TextEditingController();
@@ -161,16 +238,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             borderRadius: BorderRadius.circular(10)),
                       ),
                       onPressed: () {
-                        if (newPasswordController.text ==
-                            confirmPasswordController.text) {
-                          setState(() {
-                            password =
-                                newPasswordController.text; // เปลี่ยนรหัสผ่าน
-                          });
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("รหัสผ่านถูกเปลี่ยนแล้ว")),
-                          );
-                          Navigator.pop(context); // ปิด dialog
+                        if (newPasswordController.text == confirmPasswordController.text) {
+                          changePassword(newPasswordController.text); // เรียกใช้ฟังก์ชันเพื่อเปลี่ยนรหัสผ่าน
+                          Navigator.pop(context); // ปิด Dialog
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text("รหัสผ่านไม่ตรงกัน")),
@@ -258,6 +328,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  Future<void> deleteAccount() async {
+    final url = Uri.parse("http://192.168.1.40:3000/delete-account"); // URL สำหรับลบบัญชี
+    final response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "de": 1,  // ส่ง user_id ไปยัง server
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      // ถ้าลบบัญชีสำเร็จ
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("บัญชีของคุณถูกลบเรียบร้อยแล้ว")),
+      );
+    } else {
+      // ถ้าการลบไม่สำเร็จ
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("เกิดข้อผิดพลาดในการลบบัญชี")),
+      );
+    }
+  }
+
+
 
   void showDeleteAccountDialog() {
     showDialog(
@@ -309,10 +403,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       onPressed: () {
                         Navigator.pop(context); // ปิด dialog
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(
-                              "บัญชีของคุณถูกลบเรียบร้อยแล้ว")),
-                        );
+                        deleteAccount();  // เรียกใช้ฟังก์ชันลบบัญชี
+                          Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => LoginScreen()),  // ไปที่หน้า Login
+                          );
                       },
                       child: Text("ลบบัญชี"),
                     ),
@@ -364,7 +459,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ListTile(
                       title: Text("ชื่อเล่น",
                           style: TextStyle(color: Colors.grey[700])),
-                      subtitle: Text(name,
+                      subtitle: Text("$name",
                           style: TextStyle(
                               color: Colors.black, fontWeight: FontWeight.bold)),
                       trailing: IconButton(
@@ -375,13 +470,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ListTile(
                       title: Text("ชื่อผู้ใช้",
                           style: TextStyle(color: Colors.grey[700])),
-                      subtitle: Text(username,
+                      subtitle: Text("$username",
                           style: TextStyle(color: Colors.black)),
                     ),
                     ListTile(
                       title: Text("อีเมล์",
                           style: TextStyle(color: Colors.grey[700])),
-                      subtitle: Text(email,
+                      subtitle: Text("$email",
                           style: TextStyle(color: Colors.black)),
                       trailing: IconButton(
                         icon: Icon(Icons.copy, color: Colors.deepPurpleAccent),
