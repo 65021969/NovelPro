@@ -47,7 +47,7 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
   Future<void> fetchNovels() async {
     try {
       final response = await http.get(
-          Uri.parse("http://192.168.1.40:3000/novel"));
+          Uri.parse("http://192.168.105.101:3000/novel"));
 
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
@@ -60,7 +60,7 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
             'novel_img': novel['novel_img'] != null && novel['novel_img']
                 .toString()
                 .isNotEmpty
-                ? "http://192.168.1.40:3000/uploads/${novel['novel_img']}"
+                ? "http://192.168.105.101:3000/uploads/${novel['novel_img']}"
                 : 'https://via.placeholder.com/150', // รูปสำรอง
             'novel_type_name': novel['novel_type_name'],
           }).toList();
@@ -87,7 +87,7 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
 
     final request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://192.168.1.40:3000/novel'),
+      Uri.parse('http://192.168.105.101:3000/novel'),
     );
 
     request.fields['novel_name'] = _nameController.text;
@@ -164,7 +164,7 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
         width: double.infinity, // เพิ่มการกำหนดความกว้าง
         height: MediaQuery.of(context).size.height, // เพิ่มการกำหนดความสูง
         color: Color(0xFFE0E0E0), // พื้นหลังสี
-        padding: EdgeInsets.all(16),
+        padding: EdgeInsets.only(top: 0, left: 16, right: 16),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

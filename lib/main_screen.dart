@@ -31,23 +31,27 @@ class _MainScreenState extends State<MainScreen> {
       body: _pages[_selectedIndex],
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF396afc), Color(0xFF2948ff)], // ไล่สีม่วงเหมือนกับ AppBar
-          ),
-          border: Border(
-            top: BorderSide(
-              color: Colors.deepPurpleAccent, // สีเส้นขอบด้านบน
-              width: 1.0, // ความหนาของเส้นขอบ
+          color: Color(0xFF3A3A98), // สีกรมอ่อนลง
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1), // เงาจางๆ
+              blurRadius: 10,
+              spreadRadius: 2,
             ),
+          ],
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(7),
+            topRight: Radius.circular(7),
           ),
         ),
         child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
           currentIndex: _selectedIndex,
           onTap: _onItemTapped,
-          selectedItemColor: Colors.deepPurple,
-          unselectedItemColor: Colors.grey,
+          selectedItemColor: Colors.purple,
+          unselectedItemColor: Colors.black54,
+          backgroundColor: Colors.grey[200], // สีแถบ nav bar
+          elevation: 0, // ปิดเงาจาก BottomNavigationBar เพราะใช้ Container แล้ว
           items: [
             BottomNavigationBarItem(icon: Icon(Icons.library_books), label: 'ชั้นหนังสือ'),
             BottomNavigationBarItem(icon: Icon(Icons.home), label: 'หน้าหลัก'),
@@ -58,4 +62,5 @@ class _MainScreenState extends State<MainScreen> {
       ),
     );
   }
+
 }

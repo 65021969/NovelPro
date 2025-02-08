@@ -23,7 +23,7 @@ class _BookshelfScreenState extends State<BookshelfScreen> {
   Future<void> fetchNovels() async {
     try {
       final response =
-      await http.get(Uri.parse("http://192.168.1.40:3000/favoritess"));
+      await http.get(Uri.parse("http://192.168.105.101:3000/favoritess"));
 
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
@@ -38,7 +38,7 @@ class _BookshelfScreenState extends State<BookshelfScreen> {
             'description': novel['description'] ?? 'ไม่มีคำอธิบาย',
             'image': novel['novel_img'] != null &&
                 novel['novel_img'].toString().isNotEmpty
-                ? "http://192.168.1.40:3000/uploads/${novel['novel_img']}"
+                ? "http://192.168.105.101:3000/uploads/${novel['novel_img']}"
                 : 'https://via.placeholder.com/150',
           })
               .toList();

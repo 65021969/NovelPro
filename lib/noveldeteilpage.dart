@@ -26,7 +26,7 @@ class NovelDetailPage extends StatefulWidget {
 
 class _NovelDetailPageState extends State<NovelDetailPage> {
   bool isFavorite = false;
-  final String apiUrl = "http://192.168.1.40:3000"; // URL ของเซิร์ฟเวอร์
+  final String apiUrl = "http://192.168.105.101:3000"; // URL ของเซิร์ฟเวอร์
   List<Map<String, dynamic>> volumes = []; // รายการเล่มของนิยาย
 
   @override

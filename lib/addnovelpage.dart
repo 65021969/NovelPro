@@ -21,7 +21,7 @@ class _AddnovelPageState extends State<AddnovelPage> {
       final jsonDescription = json.encode(_quillController.document.toDelta().toJson());
 
       final response = await http.post(
-        Uri.parse('http://192.168.1.40:3000/addnovel'),
+        Uri.parse('http://192.168.105.101:3000/addnovel'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'novel_id': widget.novel['novel_id'],
@@ -47,9 +47,19 @@ class _AddnovelPageState extends State<AddnovelPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("เพิ่มเล่มใหม่"),
+        title: Text("เพิ่มเล่มใหม่",style: TextStyle(color: Colors.white), ),
         backgroundColor: Colors.deepPurple,
-        centerTitle: true,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF5e35b1), Color(0xFF9c27b0)],
+            ),
+          ),
+        ),
+        elevation: 6,
+        centerTitle: false,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -74,6 +84,8 @@ class _AddnovelPageState extends State<AddnovelPage> {
             // ✅ แก้ปัญหา QuillToolbar
             quill.QuillToolbar.simple(controller: _quillController),
             SizedBox(height: 10),
+
+
 
             // ✅ แก้ไข QuillEditor ให้ใช้งานได้บน Android
             Expanded(

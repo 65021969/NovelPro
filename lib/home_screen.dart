@@ -22,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // ดึงข้อมูลนิยายจาก API
   Future<void> fetchNovels() async {
     try {
-      final response = await http.get(Uri.parse("http://192.168.1.40:3000/novels"));
+      final response = await http.get(Uri.parse("http://192.168.105.101:3000/novels"));
 
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
@@ -34,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
             'penname': novel['novel_penname'],
             'description': novel['description'] ?? 'ไม่มีคำอธิบาย',
             'image': novel['novel_img'] != null && novel['novel_img'].toString().isNotEmpty
-                ? "http://192.168.1.40:3000/uploads/${novel['novel_img']}"
+                ? "http://192.168.105.101:3000/uploads/${novel['novel_img']}"
                 : 'https://via.placeholder.com/150',
           }).toList();
 
@@ -82,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 0.0),
+            padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 0.0),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -103,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: _filteredNovels.isEmpty
                 ? Center(child: CircularProgressIndicator())
                 : Padding(
-              padding: EdgeInsets.all(8),
+              padding: EdgeInsets.only(top:3,bottom: 0, left: 3,right: 3),
               child: GridView.builder(
                 key: ValueKey(_filteredNovels.length),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

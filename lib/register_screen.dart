@@ -38,7 +38,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     try {
-      var url = Uri.parse("http://192.168.1.40:3000/register");
+      var url = Uri.parse("http://192.168.105.101:3000/register");
       var response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
