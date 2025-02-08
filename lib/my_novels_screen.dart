@@ -46,20 +46,16 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
 
   Future<void> fetchNovels() async {
     try {
-      final response = await http.get(
-          Uri.parse("http://192.168.105.101:3000/novel"));
-
+      final response = await http.get(Uri.parse("http://192.168.105.101:3000/novel"));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
         setState(() {
-          novels = data.map((novel) =>
-          {
+          novels = data.map((novel) => {
             'novel_id': novel['novel_id'],
             'novel_name': novel['novel_name'].toString(),
             'novel_penname': novel['novel_penname'].toString(),
-            'novel_img': novel['novel_img'] != null && novel['novel_img']
-                .toString()
-                .isNotEmpty
+            'novel_img': novel['novel_img'] != null &&
+                novel['novel_img'].toString().isNotEmpty
                 ? "http://192.168.105.101:3000/uploads/${novel['novel_img']}"
                 : 'https://via.placeholder.com/150', // รูปสำรอง
             'novel_type_name': novel['novel_type_name'],
@@ -74,13 +70,17 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
   }
 
   Future<void> addNovelToServer() async {
-    // Validate form fields
-    if (_nameController.text.isEmpty || _authorController.text.isEmpty ||
-        _selectedGenre == null || _image == null) {
+    // ตรวจสอบความถูกต้องของข้อมูลที่กรอก
+    if (_nameController.text.isEmpty ||
+        _authorController.text.isEmpty ||
+        _selectedGenre == null ||
+        _image == null) {
       setState(() {
-        _nameError = _nameController.text.isEmpty ? 'กรุณากรอกชื่อนิยาย' : null;
-        _authorError =
-        _authorController.text.isEmpty ? 'กรุณากรอกนามปากกา' : null;
+        _nameError =
+        _nameController.text.isEmpty ? 'กรุณากรอกชื่อนิยาย' : null;
+        _authorError = _authorController.text.isEmpty
+            ? 'กรุณากรอกนามปากกา'
+            : null;
       });
       return;
     }
@@ -94,29 +94,97 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
     request.fields['novel_penname'] = _authorController.text;
     request.fields['novel_type_id'] =
         (genreMap[_selectedGenre ?? ''] ?? 0).toString();
-
     request.files.add(
       await http.MultipartFile.fromPath('novel_img', _image!.path),
     );
 
+    // ส่ง request ไปยังเซิร์ฟเวอร์ (แต่ไม่ต้องรอการตอบกลับ)
+    // กด "ตกลง" แล้วรีเฟรชหน้าจอทันที
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16), // ปรับมุมให้มน
+          ),
+          backgroundColor: Colors.white, // สีพื้นหลังของ dialog
+          title: Center(  // จัดตำแหน่ง title ให้อยู่กลาง
+            child: Text(
+              'สร้างนิยายสำเร็จ',
+              style: TextStyle(
+                color: Colors.green,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          content: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.check_circle_outline,
+                  color: Colors.green,
+                  size: 80,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // ปิด dialog
+                  // เคลียร์ฟอร์มเมื่อกด "ตกลง"
+                  _nameController.clear();
+                  _authorController.clear();
+                  _selectedGenre = null;
+                  setState(() {
+                    _image = null;
+                  });
+                  // รีเฟรชหน้าทันทีหลังจากกดตกลง
+                  fetchNovels();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green, // สีพื้นหลังของปุ่ม
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8), // มุมไม่มนเกินไป
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24), // ขนาดปุ่มพอเหมาะ
+                  elevation: 4, // เงาปุ่มที่ไม่มากเกินไป
+                ),
+                child: Text(
+                  'ตกลง',
+                  style: TextStyle(
+                    fontSize: 16, // ขนาดฟอนต์ที่ไม่ใหญ่เกินไป
+                    fontWeight: FontWeight.bold, // ทำให้ฟอนต์หนาขึ้น
+                    color: Colors.white, // สีฟอนต์
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    // ส่ง request ไปยังเซิร์ฟเวอร์
     final response = await request.send();
-    if (response.statusCode == 201) {
-      fetchNovels();
-      _nameController.clear();
-      _authorController.clear();
-      _selectedGenre = null;
-      setState(() => _image = null);
-    } else {
+    // ตรวจสอบสถานะของการตอบกลับ
+    debugPrint('Response Status: ${response.statusCode}');
+    debugPrint('Response Reason: ${response.reasonPhrase}');
+
+    if (response.statusCode != 201) {
       setState(() {
-        _nameError = 'เกิดข้อผิดพลาด: ${response.reasonPhrase}';
+        _nameError;
       });
-      print("เกิดข้อผิดพลาด: ${response.reasonPhrase}");
     }
   }
 
   Future<void> _pickImage() async {
-    final pickedFile = await ImagePicker().pickImage(
-        source: ImageSource.gallery);
+    final pickedFile =
+    await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
@@ -137,6 +205,7 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     print('novel_id1');
     print(novels);
@@ -145,7 +214,9 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
         title: Text(
           'นิยายของฉัน',
           style: TextStyle(
-              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 20),
         ),
         backgroundColor: Colors.deepPurple,
         flexibleSpace: Container(
@@ -161,8 +232,8 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
         centerTitle: false,
       ),
       body: Container(
-        width: double.infinity, // เพิ่มการกำหนดความกว้าง
-        height: MediaQuery.of(context).size.height, // เพิ่มการกำหนดความสูง
+        width: double.infinity, // กำหนดความกว้างเต็มจอ
+        height: MediaQuery.of(context).size.height, // กำหนดความสูงเต็มจอ
         color: Color(0xFFE0E0E0), // พื้นหลังสี
         padding: EdgeInsets.only(top: 0, left: 16, right: 16),
         child: SingleChildScrollView(
@@ -280,8 +351,10 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
         ),
         contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
-      items: genres.map((genre) =>
-          DropdownMenuItem(value: genre, child: Text(genre))).toList(),
+      items: genres
+          .map((genre) =>
+          DropdownMenuItem(value: genre, child: Text(genre)))
+          .toList(),
       onChanged: (value) => setState(() => _selectedGenre = value),
     );
   }
@@ -308,12 +381,12 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
           ),
           child: _image != null
               ? ClipRRect(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(8),
             child: Image.file(_image!, fit: BoxFit.cover),
           )
               : Icon(Icons.image, size: 60, color: Colors.deepPurple),
         ),
-        SizedBox(width: 16),
+        SizedBox(width: 16), ///////////////////////////////////
         ElevatedButton.icon(
           onPressed: _pickImage,
           icon: Icon(Icons.upload_file, color: Colors.white),
@@ -328,39 +401,47 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
         ),
       ],
     );
+
   }
 
   Widget _buildActionButtons() {
-    double buttonWidth = 150;
-    double buttonHeight = 40;
-    double positionValue = 0.26;
+    double positionValue = 0.27;  // ปรับค่านี้เพื่อเปลี่ยนตำแหน่ง
+    double buttonWidth = 143;  // กำหนดความยาวของปุ่ม
+    double buttonHeight = 50;  // กำหนดความสูงของปุ่ม
 
-    return Row(
+    return Column(  // ใช้ Column แทน Row
       children: [
-        Expanded(
-          child: Align(
-            alignment: Alignment(positionValue, 0),
-            child: ElevatedButton(
-              onPressed: addNovelToServer,
-              child: Text(
-                'สร้างนิยาย',
-                style: TextStyle(fontSize: 18, color: Colors.white),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+        Row(
+          children: [
+            Expanded(
+              child: Align(
+                alignment: Alignment(positionValue, 0),  // ปรับตำแหน่งของปุ่มในแนวนอน
+                child: Container(
+                  width: buttonWidth,  // กำหนดความยาวของปุ่ม
+                  height: buttonHeight,  // กำหนดความสูงของปุ่ม
+                  child: ElevatedButton(
+                    onPressed: addNovelToServer,
+                    child: Text(
+                      'สร้างนิยาย',
+                      style: TextStyle(fontSize: 18, color: Colors.white),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                  ),
                 ),
-                padding: EdgeInsets.symmetric(vertical: 14),
-                minimumSize: Size(buttonWidth, buttonHeight),
-                maximumSize: Size(300, 80),
               ),
             ),
-          ),
+          ],
         ),
+        SizedBox(height: 0),  // เพิ่มระยะห่างระหว่างปุ่ม
       ],
     );
   }
+
 
   Widget _buildNovelGrid() {
     return novels.isEmpty
@@ -387,7 +468,8 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => NovelDetailPage(novel: novels[index]),
+                builder: (context) =>
+                    NovelDetailPage(novel: novels[index]),
               ),
             );
           },
@@ -412,8 +494,8 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
                       width: double.infinity,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
-                        return Icon(
-                            Icons.broken_image, size: 50, color: Colors.grey);
+                        return Icon(Icons.broken_image,
+                            size: 50, color: Colors.grey);
                       },
                     ),
                   ),
@@ -422,7 +504,8 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
                   padding: EdgeInsets.all(8),
                   child: Text(
                     novels[index]['novel_name'],
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 16),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -442,4 +525,3 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
     );
   }
 }
-
