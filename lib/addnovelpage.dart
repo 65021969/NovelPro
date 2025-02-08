@@ -21,11 +21,9 @@ class _AddnovelPageState extends State<AddnovelPage> {
         Uri.parse('http://192.168.1.40:3000/addnovel'), // URL ของ API ที่จะรับข้อมูล
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
-          'novel_name': widget.novel['novel_name'], // ใช้ข้อมูลจาก novel ที่ส่งมาจาก NovelDetailPage
-          'novel_penname': widget.novel['novel_penname'],
-          'novel_type_name': widget.novel['novel_type_name'],
-          'description': _descriptionController.text,
-          'novel_number': int.tryParse(_bookNumberController.text) ?? 0, // หมายเลขเล่มที่กรอก
+          'novel_id':widget.novel['novel_id'],// ใช้ข้อมูลจาก novel ที่ส่งมาจาก NovelDetailPage
+          'chap_write': _descriptionController.text,
+          'novel_num': int.tryParse(_bookNumberController.text) ?? 0, // หมายเลขเล่มที่กรอก
         }),
       );
 
@@ -46,6 +44,8 @@ class _AddnovelPageState extends State<AddnovelPage> {
 
   @override
   Widget build(BuildContext context) {
+    print('novel_id');
+    print(widget.novel['novel_id']);
     return Scaffold(
       appBar: AppBar(
         title: Text("เพิ่มเล่มใหม่"),

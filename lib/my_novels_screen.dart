@@ -47,19 +47,20 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
   Future<void> fetchNovels() async {
     try {
       final response = await http.get(
-          Uri.parse("http://192.168.105.101:3000/novel"));
+          Uri.parse("http://192.168.1.40:3000/novel"));
 
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
         setState(() {
           novels = data.map((novel) =>
           {
+            'novel_id': novel['novel_id'],
             'novel_name': novel['novel_name'].toString(),
             'novel_penname': novel['novel_penname'].toString(),
             'novel_img': novel['novel_img'] != null && novel['novel_img']
                 .toString()
                 .isNotEmpty
-                ? "http://192.168.105.101:3000/uploads/${novel['novel_img']}"
+                ? "http://192.168.1.40:3000/uploads/${novel['novel_img']}"
                 : 'https://via.placeholder.com/150', // รูปสำรอง
             'novel_type_name': novel['novel_type_name'] ?? "ไม่ระบุ",
           }).toList();
@@ -86,7 +87,7 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
 
     final request = http.MultipartRequest(
       'POST',
-      Uri.parse('http://192.168.105.101:3000/novel'),
+      Uri.parse('http://192.168.1.40:3000/novel'),
     );
 
     request.fields['novel_name'] = _nameController.text;
@@ -137,6 +138,8 @@ class _MyNovelsScreenState extends State<MyNovelsScreen> {
   }
 
   Widget build(BuildContext context) {
+    print('novel_id1');
+    // print(novels);
     return Scaffold(
       appBar: AppBar(
         title: Text(
