@@ -28,12 +28,15 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
   bool isFavorite = false;
   final String apiUrl = "http://192.168.1.40:3000"; // URL ของเซิร์ฟเวอร์
   List<Map<String, dynamic>> volumes = []; // รายการเล่มของนิยาย
+  List<Map<String, dynamic>> comments = []; // รายการคอมเม้นต์
+  final TextEditingController commentController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     checkFavoriteStatus();
     fetchVolumes();
+    fetchComments();
   }
 
   Future<void> checkFavoriteStatus() async {
@@ -83,7 +86,7 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
       if (response.statusCode == 200) {
         final List<dynamic> result = json.decode(response.body);
         setState(() {
-          volumes = result.cast<Map<String, dynamic>>();
+          volumes = result.cast<Map<String, dynamic>>(); // เลือกข้อมูลจาก server
         });
       }
     } catch (e) {
@@ -91,8 +94,48 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
     }
   }
 
+  Future<void> fetchComments() async {
+    try {
+      final response = await http.get(Uri.parse("$apiUrl/comment/${widget.novelId}"));
+      if (response.statusCode == 200) {
+        final List<dynamic> result = json.decode(response.body);
+        setState(() {
+          comments = result.cast<Map<String, dynamic>>(); // เลือกข้อมูลจาก server
+        });
+      }
+    } catch (e) {
+      print("Error fetching comments: $e");
+    }
+  }
+
+  Future<void> postComment() async {
+    if (commentController.text.isEmpty) return;
+    try {
+      final response = await http.post(
+        Uri.parse("$apiUrl/comment"),
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({
+          "novel_id": widget.novelId,
+          "com_text": commentController.text,
+        }),
+      );
+      if (response.statusCode == 201) {
+        setState(() {
+          comments.add({
+            'com_text': commentController.text,
+            // 'author': 'User', // You can replace this with the actual username
+          });
+        });
+        commentController.clear();
+      }
+    } catch (e) {
+      print("Error posting comment: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -161,12 +204,6 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => AllChapterDetailPage(
-                              // novelId: widget.novelId,
-                              // novelTitle: widget.title,
-                              // novelDescription: widget.description,
-                              // novelImageUrl: widget.imageUrl,
-                              // novelType: widget.type,
-                              // novelPenname: widget.penname,
                               novelVolumes: volumes[index], // ส่งข้อมูลทั้งหมดไป
                             ),
                           ),
@@ -175,6 +212,45 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
                     ),
                   );
                 },
+              ),
+              SizedBox(height: 20),
+              Text("ความคิดเห็น", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+              SizedBox(height: 10),
+              comments.isEmpty
+                  ? Center(child: Text("ยังไม่มีความคิดเห็น", style: TextStyle(fontSize: 18, color: Colors.grey)))
+                  : ListView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: comments.length,
+                itemBuilder: (context, index) {
+                  final comment = comments[index];
+                  return Card(
+                    elevation: 3,
+                    margin: EdgeInsets.symmetric(vertical: 5),
+                    child: ListTile(
+                      title: Text(comments[0]['user_name'], style: TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text(comments[0]['com_text'].toString()),
+                    ),
+                  );
+                },
+              ),
+              SizedBox(height: 10),
+              TextField(
+                controller: commentController,
+                decoration: InputDecoration(
+                  hintText: "พิมพ์ความคิดเห็นของคุณ...",
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 3,
+              ),
+              SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: postComment,
+                child: Text("โพสต์ความคิดเห็น"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.purple,
+                  foregroundColor: Colors.white,
+                ),
               ),
             ],
           ),
