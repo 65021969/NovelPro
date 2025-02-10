@@ -141,6 +141,39 @@ app.get('/user', async (req, res) => {
   }
 });
 
+//ลืมรหัส
+app.post("/forgot-password", async (req, res) => {
+  const { user_email, user_pass } = req.body;
+  console.log("Received Data:", req.body);
+
+  if (!user_email || !user_pass) {
+    return res.status(400).json({ message: "กรุณากรอกอีเมลและรหัสผ่านใหม่" });
+  }
+
+  try {
+    // ✅ 1. ตรวจสอบว่ามีอีเมลอยู่ในฐานข้อมูลหรือไม่
+    const userCheck = await pool.query("SELECT * FROM userinfo WHERE user_email = $1", [user_email]);
+
+    if (userCheck.rows.length === 0) {
+      return res.status(404).json({ message: "ไม่พบผู้ใช้ที่ระบุ" });
+    }
+
+    // ✅ 2. ถ้ามีอีเมล → ทำการเข้ารหัสรหัสผ่านใหม่
+    const hashedPassword = await bcrypt.hash(user_pass, 10);
+    console.log("Hashed Password:", hashedPassword);
+
+    // ✅ 3. อัปเดตรหัสผ่านในฐานข้อมูล
+    await pool.query("UPDATE userinfo SET user_pass = $1 WHERE user_email = $2", [hashedPassword, user_email]);
+
+    res.status(200).json({ message: "รหัสผ่านถูกเปลี่ยนเรียบร้อยแล้ว" });
+    console.log("รหัสผ่านถูกเปลี่ยนเรียบร้อยแล้ว");
+  } catch (error) {
+    console.error("Error changing password:", error);
+    res.status(500).json({ message: "เกิดข้อผิดพลาดในการเปลี่ยนรหัสผ่าน" });
+  }
+});
+
+
 //เปลี่ยนรหัสผ่าน
 app.post('/change-password', async (req, res) => {
   const userId = userid;

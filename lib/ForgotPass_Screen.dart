@@ -15,20 +15,27 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _emailController = TextEditingController();
-
-  void _sendResetLink() async {
-    String email = _emailController.text.trim();
-
+  final _newPasswordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  void _sendResetLink(String text) async {
+    String email = _emailController.text;
+    String newPasswordController = _newPasswordController.text;
+    String confirmPasswordController = _confirmPasswordController.text;
     if (email.isNotEmpty) {
       try {
         final response = await http.post(
-          Uri.parse('http://192.168.1.40:3000/api/auth/forgot-password'),
+          Uri.parse('http://192.168.1.40:3000/forgot-password'),
           headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({'email': email}),
+          body: jsonEncode(
+              {
+                'user_email': email,
+                'user_pass': newPasswordController
+              },
+          ),
         );
 
         final message = response.statusCode == 200
-            ? 'ลิงก์สำหรับรีเซ็ตรหัสผ่านถูกส่งไปยังอีเมลของคุณแล้ว'
+            ? 'รหัสผ่านถูกเปลี่ยนเรียบร้อยแล้ว'
             : jsonDecode(response.body)['message'] ?? 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง';
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -57,7 +64,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       );
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -119,19 +125,52 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       ),
                       keyboardType: TextInputType.emailAddress,
                     ),
+                    TextField(
+                      controller: _newPasswordController,
+                      decoration: InputDecoration(
+                        labelText: 'รหัสผ่านใหม่',
+                        labelStyle: TextStyle(color: Color(0xFF673AB7)),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        prefixIcon: Icon(Icons.lock, color: Color(0xFF673AB7)), // เปลี่ยนเป็นไอคอนกุญแจสำหรับรหัสผ่าน
+                        contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                      ),
+                      obscureText: true, //
+                      keyboardType: TextInputType.visiblePassword,
+                    ),
+                    TextField(
+                      controller: _confirmPasswordController,
+                      decoration: InputDecoration(
+                        labelText: 'ยืนยันรหัสผ่าน',
+                        labelStyle: TextStyle(color: Color(0xFF673AB7)),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        prefixIcon: Icon(Icons.email, color: Color(0xFF673AB7)),
+                        contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                      ),
+                        obscureText: true, //
+                        keyboardType: TextInputType.visiblePassword,
+                    ),
                     SizedBox(height: 30),
                     SizedBox(
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: _sendResetLink,
+                        onPressed: (){
+                          if (_newPasswordController.text == _confirmPasswordController.text) {
+                            _sendResetLink(_newPasswordController.text); // เรียกใช้ฟังก์ชันเพื่อเปลี่ยนรหัสผ่าน
+                            // Navigator.pop(context); // ปิด Dialog
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("รหัสผ่านไม่ตรงกัน")),
+                            );
+                          }
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xFF673AB7),
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           elevation: 3,
                         ),
-                        child: Text('ส่งลิงก์รีเซ็ตรหัสผ่าน', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        child: Text('รีเซ็ตรหัสผ่าน', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                       ),
                     ),
                     SizedBox(height: 20),
