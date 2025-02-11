@@ -53,10 +53,10 @@ class _MainScreenState extends State<MainScreen> {
           backgroundColor: Colors.grey[200], // สีแถบ nav bar
           elevation: 0, // ปิดเงาจาก BottomNavigationBar เพราะใช้ Container แล้ว
           items: [
-            BottomNavigationBarItem(icon: Icon(Icons.library_books), label: 'ชั้นหนังสือ'),
+            BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'รายการโปรด'),
             BottomNavigationBarItem(icon: Icon(Icons.home), label: 'หน้าหลัก'),
-            BottomNavigationBarItem(icon: Icon(Icons.book), label: 'นิยายของฉัน'),
-            BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'ตั้งค่า'),
+            BottomNavigationBarItem(icon: Icon(Icons.menu_book), label: 'นิยายของฉัน'),
+            BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'เพิ่มเติม'),
           ],
         ),
       ),

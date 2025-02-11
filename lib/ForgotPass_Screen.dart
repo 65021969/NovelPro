@@ -24,7 +24,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     if (email.isNotEmpty) {
       try {
         final response = await http.post(
-          Uri.parse('http://192.168.1.40:3000/forgot-password'),
+          Uri.parse('http://26.210.128.157:3000/forgot-password'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode(
               {
@@ -64,20 +64,21 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       );
     }
   }
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF673AB7), Color(0xFFAB47BC)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+ @override
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFF673AB7), Color(0xFFAB47BC)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        child: Center(
-          child: Padding(
-            padding: EdgeInsets.all(20),
+      ),
+      child: Center(
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: SingleChildScrollView(  // ✅ ใช้ SingleChildScrollView
             child: Card(
               elevation: 5,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -109,7 +110,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                     SizedBox(height: 20),
                     Text(
-                      'กรุณากรอกอีเมลของคุณเพื่อรับลิงก์สำหรับรีเซ็ตรหัสผ่าน',
+                      'กรุณากรอกอีเมลของคุณเพื่อสำหรับการรีเซ็ตรหัสผ่าน',
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 16, color: Colors.black54),
                     ),
@@ -125,29 +126,31 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       ),
                       keyboardType: TextInputType.emailAddress,
                     ),
+                    SizedBox(height: 20),
                     TextField(
                       controller: _newPasswordController,
                       decoration: InputDecoration(
                         labelText: 'รหัสผ่านใหม่',
                         labelStyle: TextStyle(color: Color(0xFF673AB7)),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        prefixIcon: Icon(Icons.lock, color: Color(0xFF673AB7)), // เปลี่ยนเป็นไอคอนกุญแจสำหรับรหัสผ่าน
+                        prefixIcon: Icon(Icons.lock, color: Color(0xFF673AB7)),
                         contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                       ),
-                      obscureText: true, //
+                      obscureText: true,
                       keyboardType: TextInputType.visiblePassword,
                     ),
+                    SizedBox(height: 20),
                     TextField(
                       controller: _confirmPasswordController,
                       decoration: InputDecoration(
                         labelText: 'ยืนยันรหัสผ่าน',
                         labelStyle: TextStyle(color: Color(0xFF673AB7)),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        prefixIcon: Icon(Icons.email, color: Color(0xFF673AB7)),
+                        prefixIcon: Icon(Icons.lock, color: Color(0xFF673AB7)),
                         contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                       ),
-                        obscureText: true, //
-                        keyboardType: TextInputType.visiblePassword,
+                      obscureText: true,
+                      keyboardType: TextInputType.visiblePassword,
                     ),
                     SizedBox(height: 30),
                     SizedBox(
@@ -156,8 +159,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       child: ElevatedButton(
                         onPressed: (){
                           if (_newPasswordController.text == _confirmPasswordController.text) {
-                            _sendResetLink(_newPasswordController.text); // เรียกใช้ฟังก์ชันเพื่อเปลี่ยนรหัสผ่าน
-                            // Navigator.pop(context); // ปิด Dialog
+                            _sendResetLink(_newPasswordController.text);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text("รหัสผ่านไม่ตรงกัน")),
@@ -190,6 +192,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 }

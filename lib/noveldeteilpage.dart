@@ -26,7 +26,7 @@ class NovelDetailPage extends StatefulWidget {
 
 class _NovelDetailPageState extends State<NovelDetailPage> {
   bool isFavorite = false;
-  final String apiUrl = "http://192.168.105.101:3000"; // URL ของเซิร์ฟเวอร์
+  final String apiUrl = "http://26.210.128.157:3000"; // URL ของเซิร์ฟเวอร์
   List<Map<String, dynamic>> volumes = []; // รายการเล่มของนิยาย
   List<Map<String, dynamic>> comments = []; // รายการคอมเม้นต์
   final TextEditingController commentController = TextEditingController();
@@ -245,7 +245,7 @@ class _NovelDetailPageState extends State<NovelDetailPage> {
                     elevation: 5,
                     margin: EdgeInsets.symmetric(vertical: 5),
                     child: ListTile(
-                      title: Text(comment['user_name'], style: TextStyle(fontWeight: FontWeight.bold)),
+                      title: Text(comment['user_name'].toString(), style: TextStyle(fontWeight: FontWeight.bold)),
                       subtitle: Text(comment['com_text'].toString()),
                     ),
                   );

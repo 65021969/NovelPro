@@ -21,7 +21,7 @@ class _AddnovelPageState extends State<AddnovelPage> {
       final jsonDescription = json.encode(_quillController.document.toDelta().toJson());
 
       final response = await http.post(
-        Uri.parse('http://192.168.105.101:3000/addnovel'),
+        Uri.parse('http://26.210.128.157:3000/addnovel'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'novel_id': widget.novel['novel_id'],
@@ -43,7 +43,7 @@ class _AddnovelPageState extends State<AddnovelPage> {
     }
   }
 
-  @override
+    @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -61,58 +61,53 @@ class _AddnovelPageState extends State<AddnovelPage> {
         elevation: 6,
         centerTitle: false,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "หมายเลขเล่ม",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            TextField(
-              controller: _bookNumberController,
-              decoration: InputDecoration(
-                hintText: "กรอกหมายเลขเล่ม",
-                border: OutlineInputBorder(),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("หมายเลขเล่ม", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              SizedBox(height: 10),
+              TextField(
+                controller: _bookNumberController,
+                decoration: InputDecoration(
+                  hintText: "กรอกหมายเลขเล่ม",
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
               ),
-              keyboardType: TextInputType.number,
-            ),
-            SizedBox(height: 10),
+              SizedBox(height: 10),
 
-            // ✅ แก้ปัญหา QuillToolbar
-            quill.QuillToolbar.simple(controller: _quillController),
-            SizedBox(height: 10),
+              quill.QuillToolbar.simple(controller: _quillController),
+              SizedBox(height: 10),
 
-            // ✅ แก้ไข QuillEditor ให้ใช้งานได้บน Android
-            Expanded(
-              child: Container(
-                padding: EdgeInsets.all(10),
+              Container(
+                height: 340, // กำหนดความสูงเพื่อให้แสดงผลได้ดี
+                padding: EdgeInsets.all(2),
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey.shade400),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: quill.QuillEditor(
+                child: quill.QuillEditor.basic(
                   controller: _quillController,
-                  scrollController: ScrollController(),
-                  focusNode: FocusNode(),
+                  //readOnly: false,
                 ),
               ),
-            ),
-            SizedBox(height: 10),
+              SizedBox(height: 10),
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ElevatedButton(
-                  onPressed: _submitNovel,
-                  child: Text("บันทึก"),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                ),
-              ],
-            ),
-          ],
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton(
+                    onPressed: _submitNovel,
+                    child: Text("บันทึก"),
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

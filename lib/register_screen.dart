@@ -38,7 +38,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     try {
-      var url = Uri.parse("http://192.168.105.101:3000/register");
+      var url = Uri.parse("http://26.210.128.157:3000/register");
       var response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
@@ -141,21 +141,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        height: MediaQuery.of(context).size.height,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF5e35b1), Color(0xFF9c27b0)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: Container(
+      height: MediaQuery.of(context).size.height,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFF5e35b1), Color(0xFF9c27b0)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        child: Center(
-          child: Padding(
-            padding: EdgeInsets.all(20),
+      ),
+      child: Center(
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: SingleChildScrollView(  // ✅ ใช้ SingleChildScrollView
             child: Card(
               elevation: 4,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -226,6 +227,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 }

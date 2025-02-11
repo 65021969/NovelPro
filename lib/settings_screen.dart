@@ -25,7 +25,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> fetchUserInfo() async {
-    final url = Uri.parse("http://192.168.1.40:3000/user");
+    final url = Uri.parse("http://26.210.128.157:3000/user");
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
@@ -45,7 +45,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> updateUserName(String newName) async {
-    final url = Uri.parse("http://192.168.1.40:3000/updateName");
+    final url = Uri.parse("http://26.210.128.157:3000/updateName");
     try {
       final response = await http.post(
         url,
@@ -157,7 +157,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> changePassword(String newPassword) async {
-    final url = Uri.parse("http://192.168.1.40:3000/change-password"); // เปลี่ยนเป็น URL ของ API ของคุณ
+    final url = Uri.parse("http://26.210.128.157:3000/change-password"); // เปลี่ยนเป็น URL ของ API ของคุณ
     final response = await http.post(
       url,
       headers: {"Content-Type": "application/json"},
@@ -329,7 +329,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> deleteAccount() async {
-    final url = Uri.parse("http://192.168.1.40:3000/delete-account"); // URL สำหรับลบบัญชี
+    final url = Uri.parse("http://26.210.128.157:3000/delete-account"); // URL สำหรับลบบัญชี
     final response = await http.post(
       url,
       headers: {"Content-Type": "application/json"},
@@ -422,103 +422,127 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'บัญชีของฉัน',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.deepPurpleAccent,
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFF5e35b1), Color(0xFF9c27b0)],
-            ),
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: Text(
+        'บัญชีของฉัน',
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      backgroundColor: Colors.deepPurpleAccent,
+      flexibleSpace: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF5e35b1), Color(0xFF9c27b0)],
           ),
         ),
       ),
-      backgroundColor: Colors.grey[100],
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+    ),
+    backgroundColor: Colors.grey[100],
+    body: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: SingleChildScrollView(  // ✅ ใช้ SingleChildScrollView
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Card(
-              shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-              elevation: 4,
-              color: Colors.white,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ListTile(
-                      title: Text("ชื่อเล่น",
-                          style: TextStyle(color: Colors.grey[700])),
-                      subtitle: Text("$name",
-                          style: TextStyle(
-                              color: Colors.black, fontWeight: FontWeight.bold)),
-                      trailing: IconButton(
-                        icon: Icon(Icons.edit, color: Colors.deepPurpleAccent),
-                        onPressed: editName,
-                      ),
-                    ),
-                    ListTile(
-                      title: Text("ชื่อผู้ใช้",
-                          style: TextStyle(color: Colors.grey[700])),
-                      subtitle: Text("$username",
-                          style: TextStyle(color: Colors.black)),
-                    ),
-                    ListTile(
-                      title: Text("อีเมล์",
-                          style: TextStyle(color: Colors.grey[700])),
-                      subtitle: Text("$email",
-                          style: TextStyle(color: Colors.black)),
-                      trailing: IconButton(
-                        icon: Icon(Icons.copy, color: Colors.deepPurpleAccent),
-                        onPressed: () => copyToClipboard(context, email),
-                      ),
-                    ),
-                    ListTile(
-                      title: Text("รหัสผ่าน",
-                          style: TextStyle(color: Colors.grey[700])),
-                      subtitle: Text(password,
-                          style: TextStyle(color: Colors.black)),
-                      trailing: IconButton(
-                        icon: Icon(Icons.edit, color: Colors.deepPurpleAccent),
-                        onPressed: showChangePasswordDialog, // เปิด dialog เปลี่ยนรหัสผ่าน
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+  elevation: 6, // เพิ่มเงาให้ดูเด่นขึ้น
+  color: Colors.white,
+  child: Padding(
+    padding: const EdgeInsets.all(16.0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ListTile(
+          title: Text(
+            "Username",
+            style: TextStyle(
+              color: Colors.grey[700],
+              fontSize: 16, // เพิ่มขนาดตัวอักษร
+              fontWeight: FontWeight.w600, // ใช้ตัวหนา
             ),
+          ),
+          subtitle: Text(
+            "$username",
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 18, // ขนาดตัวอักษรใหญ่ขึ้น
+              fontWeight: FontWeight.bold, // ตัวหนา
+            ),
+          ),
+        ),
+        Divider(color: Colors.grey[300]), // เพิ่มเส้นแบ่งให้ดูสะอาดตา
+        ListTile(
+          title: Text(
+            "Email",
+            style: TextStyle(
+              color: Colors.grey[700],
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          subtitle: Text(
+            "$email",
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          trailing: IconButton(
+            icon: Icon(Icons.copy, color: Colors.deepPurpleAccent),
+            onPressed: () => copyToClipboard(context, email),
+          ),
+        ),
+        Divider(color: Colors.grey[300]),
+        ListTile(
+          title: Text(
+            "Password",
+            style: TextStyle(
+              color: Colors.grey[700],
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          subtitle: Text(
+            password,
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          trailing: IconButton(
+            icon: Icon(Icons.edit, color: Colors.deepPurpleAccent),
+            onPressed: showChangePasswordDialog, // เปิด dialog เปลี่ยนรหัสผ่าน
+          ),
+        ),
+      ],
+    ),
+  ),
+),
+
             SizedBox(height: 20),
-            // Wrap ส่วนโลโก้และปุ่มใน Center widget เพื่อจัดให้อยู่ตรงกลาง
             Center(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // รูปโลโก้ในรูปแบบวงกลม
                   CircleAvatar(
-                    radius: 40, // ขนาดของวงกลม (40*2 = 80)
+                    radius: 40, 
                     backgroundImage: AssetImage('assets/logo1.png'),
                   ),
-                  SizedBox(height: 10), // ระยะห่างระหว่างโลโก้กับปุ่ม
-                  // ปุ่ม "ออกจากระบบ" ที่มีความกว้างกำหนดเอง
+                  SizedBox(height: 10),
                   SizedBox(
-                    width: 250, // กำหนดความกว้างของปุ่มตามที่ต้องการ
+                    width: 250,
                     child: ElevatedButton(
                       onPressed: showLogoutDialog,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.deepPurpleAccent,
                         foregroundColor: Colors.white,
-                        padding:
-                        EdgeInsets.symmetric(vertical: 12, horizontal: 32),
+                        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 32),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -527,16 +551,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   SizedBox(height: 16),
-                  // ปุ่ม "ลบบัญชี" ที่มีความกว้างกำหนดเอง
                   SizedBox(
-                    width: 250, // กำหนดความกว้างของปุ่ม
+                    width: 250,
                     child: ElevatedButton(
                       onPressed: showDeleteAccountDialog,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.redAccent,
                         foregroundColor: Colors.white,
-                        padding:
-                        EdgeInsets.symmetric(vertical: 12, horizontal: 32),
+                        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 32),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -550,6 +572,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

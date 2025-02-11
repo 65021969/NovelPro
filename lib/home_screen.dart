@@ -22,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // ดึงข้อมูลนิยายจาก API
   Future<void> fetchNovels() async {
     try {
-      final response = await http.get(Uri.parse("http://192.168.105.101:3000/novels"));
+      final response = await http.get(Uri.parse("http://26.210.128.157:3000/novels"));
 
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
@@ -34,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
             'penname': novel['novel_penname'],
             'description': novel['description'] ?? 'ไม่มีคำอธิบาย',
             'image': novel['novel_img'] != null && novel['novel_img'].toString().isNotEmpty
-                ? "http://192.168.105.101:3000/uploads/${novel['novel_img']}"
+                ? "http://26.210.128.157:3000/uploads/${novel['novel_img']}"
                 : 'https://via.placeholder.com/150',
           }).toList();
 
@@ -178,59 +178,69 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       },
       child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: Colors.grey, width: 0.5),
+  elevation: 4,
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(12),
+    side: BorderSide(color: Colors.grey, width: 0.5),
+  ),
+  color: Colors.white,
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      ClipRRect(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(12),
+          topRight: Radius.circular(12),
         ),
-        color: Colors.white,
+        child: CachedNetworkImage(
+          imageUrl: _filteredNovels[index]['image'],
+          height: MediaQuery.of(context).size.height * 0.19,
+          width: double.infinity,
+          fit: BoxFit.cover,
+          placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+          errorWidget: (context, url, error) => Icon(Icons.error, size: 50, color: Colors.red),
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.all(8.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
-              ),
-              child: CachedNetworkImage(
-                imageUrl: _filteredNovels[index]['image'],
-                height: MediaQuery.of(context).size.height * 0.19,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                errorWidget: (context, url, error) => Icon(Icons.error, size: 50, color: Colors.red),
+            SizedBox(
+              width: double.infinity, // ป้องกันข้อความล้นออก
+              child: Text(
+                _filteredNovels[index]['title'],
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    _filteredNovels[index]['title'],
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    _filteredNovels[index]['type'],
-                    style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    _filteredNovels[index]['penname'],
-                    style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+            SizedBox(height: 4),
+            SizedBox(
+              width: double.infinity,
+              child: Text(
+                _filteredNovels[index]['type'],
+                style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            SizedBox(
+              width: double.infinity,
+              child: Text(
+                _filteredNovels[index]['penname'],
+                style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
         ),
       ),
+    ],
+  ),
+),
+
     );
   }
 }
@@ -375,7 +385,7 @@ class NovelSearchDelegate extends SearchDelegate {
                   Text(
                     novelList[index]['title'],
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 4),
